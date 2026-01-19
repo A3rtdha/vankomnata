@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Карточка товара">
+    <title>Товар | Ванная комната</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/variables.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+
+    <script type="module" src="assets/js/product.js" defer></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container container">
+            <a href="index.html" class="logo">Ванная комната <sup>1</sup></a>
+            <div class="header-actions">
+                <a href="index.html#catalog" class="btn-outline" style="padding:10px 16px; text-decoration:none;">В каталог</a>
+                <button class="icon-btn cart-trigger-btn" id="openCartBtn" aria-label="Корзина">
+                    <span class="btn-label">Корзина</span>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="product-page container">
+        <nav class="breadcrumb" aria-label="breadcrumb">
+            <a href="index.html">Главная</a>
+            <span>›</span>
+            <a href="index.html#catalog">Каталог</a>
+            <span>›</span>
+            <span id="productCrumb">Товар</span>
+        </nav>
+
+        <section class="product-layout" id="productSection">
+            <div class="product-gallery">
+                <div class="product-img-wrapper product-main-img">
+                    <span id="productBadge" class="product-badge" style="display:none;"></span>
+                    <img id="productImage" src="" alt="">
+                </div>
+            </div>
+
+            <div class="product-info-panel">
+                <div class="product-meta">
+                    <div id="productCategory" class="product-modal-category"></div>
+                    <h1 id="productTitle" class="product-modal-title"></h1>
+                    <div id="productSku" class="product-sku"></div>
+                    <div id="productRating" class="product-rating"></div>
+                    <div id="productStock" class="product-stock"></div>
+                </div>
+
+                <div class="product-pricing">
+                    <span id="productPrice" class="price"></span>
+                    <span id="productOldPrice" class="price-old" style="display:none;"></span>
+                </div>
+
+                <div class="product-actions">
+                    <div class="qty-control">
+                        <button class="qty-btn" id="qtyMinus" aria-label="Уменьшить">−</button>
+                        <input type="number" id="qtyInput" min="1" value="1">
+                        <button class="qty-btn" id="qtyPlus" aria-label="Увеличить">+</button>
+                    </div>
+                    <button class="btn btn-block" id="addToCartBtn">В корзину</button>
+                    <button class="btn-outline btn-full" id="buyOneClickBtn">Купить в 1 клик</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="product-tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="desc">Описание</button>
+                <button class="tab-btn" data-tab="specs">Характеристики</button>
+                <button class="tab-btn" data-tab="delivery">Доставка</button>
+                <button class="tab-btn" data-tab="reviews">Отзывы</button>
+            </div>
+            <div class="tab-content active" data-tab="desc">
+                <p id="productDesc"></p>
+            </div>
+            <div class="tab-content" data-tab="specs">
+                <ul id="productSpecs" class="specs-list"></ul>
+            </div>
+            <div class="tab-content" data-tab="delivery">
+                <p>Доставка по Новосибирску и регионам. Точные сроки и стоимость зависят от адреса.</p>
+            </div>
+            <div class="tab-content" data-tab="reviews">
+                <p>Отзывы появятся после запуска личного кабинета.</p>
+            </div>
+        </section>
+
+        <section class="products-empty" id="productNotFound" style="display:none;">
+            <strong>Товар не найден</strong>
+            <div>Вернитесь в каталог и попробуйте другой товар.</div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo" style="margin-bottom: 15px;">Ванная<span>комната</span></div>
+                    <p style="color: #999; margin-bottom: 10px;">Премиальные аксессуары для создания идеальной ванной комнаты</p>
+                    <p style="color: #999; font-size: 0.9em;">Качество и комфорт в каждой детали</p>
+                </div>
+
+                <div class="footer-section">
+                    <h4 style="color: #fff; margin-bottom: 15px; font-weight: 600;">Информация</h4>
+                    <ul class="footer-links">
+                        <li><a href="index.html#catalog" style="color: #ccc; text-decoration: none;">Каталог</a></li>
+                        <li><a href="index.html" style="color: #ccc; text-decoration: none;">Главная</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section">
+                    <h4 style="color: #fff; margin-bottom: 15px; font-weight: 600;">Контакты</h4>
+                    <div style="color: #ccc; font-size: 0.9em;">
+                        <p style="margin-bottom: 5px;"><i class="fas fa-phone" style="margin-right: 8px;"></i>+7 (383) 299-06-67</p>
+                        <p style="margin-bottom: 5px;"><i class="fas fa-envelope" style="margin-right: 8px;"></i>van-komnata@mail.ru</p>
+                        <p><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>Новосибирск, Россия</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid #333;">
+                    <p style="color: #777; font-size: 0.85em;">&copy; 2026 Ванная комната. Все права защищены.</p>
+                    <p style="color: #777; font-size: 0.85em;">Сайт разработан с ❤️</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast" role="alert">Товар добавлен в корзину!</div>
+
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Корзина</h3>
+            <button class="close-cart" id="closeCart">&times;</button>
+        </div>
+        <div class="cart-body" id="cartItemsContainer"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Итого:</span>
+                <span id="cartTotalSum">0 ₽</span>
+            </div>
+            <button class="btn btn-block" id="checkoutBtn">Оформить заказ</button>
+        </div>
+    </aside>
+</body>
+</html>

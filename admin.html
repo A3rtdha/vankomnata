@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ванная комната | Панель управления</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/variables.css">
+
+    <style>
+        /* Встроенные стили для админки, чтобы не засорять основной CSS */
+        body { font-family: var(--font-main); background: #f0f2f5; padding: 20px; }
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 10px; box-shadow: var(--shadow-card); }
+        .admin-title { font-size: 1.5rem; color: var(--color-primary); }
+
+        .admin-grid { display: grid; grid-template-columns: 300px 1fr; gap: 30px; }
+
+        /* Form */
+        .editor-card { background: white; padding: 25px; border-radius: 10px; box-shadow: var(--shadow-card); position: sticky; top: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-family: inherit; }
+
+        /* Table */
+        .table-card { background: white; padding: 25px; border-radius: 10px; box-shadow: var(--shadow-card); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 15px; border-bottom: 1px solid #eee; }
+        th { background: #f8f9fa; font-weight: 600; }
+        .action-btn { cursor: pointer; border: none; background: none; padding: 5px; font-size: 1.1rem; transition: 0.2s; }
+        .btn-edit { color: #3498db; }
+        .btn-delete { color: #e74c3c; }
+        .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+
+        .btn-primary { background: var(--color-accent); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-weight: 600; }
+        .btn-danger { background: #e74c3c; color: white; margin-top: 10px; }
+        .btn-export { background: var(--color-primary); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <div class="admin-title">📦 Ванная комната - Менеджер магазина</div>
+        <div style="display: flex; gap: 10px;">
+            <a href="index.html" class="btn-export">На сайт</a>
+        </div>
+    </div>
+
+    <div class="admin-grid">
+        <!-- Форма добавления/редактирования -->
+        <aside>
+            <div class="editor-card">
+                <h3 style="margin-bottom: 20px;" id="formTitle">Новый товар</h3>
+                <form id="productForm">
+                    <input type="hidden" id="prodId">
+
+                    <div class="form-group">
+                        <label>Название</label>
+                        <input type="text" id="prodName" class="form-control" required placeholder="Напр: Мыльница">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Категория</label>
+                        <input type="text" id="prodCategory" class="form-control" list="catList" required>
+                        <datalist id="catList"></datalist>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Цена (₽)</label>
+                        <input type="number" id="prodPrice" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Старая цена (₽)</label>
+                        <input type="number" id="prodOldPrice" class="form-control" placeholder="Опционально">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Бейдж (Хит/Новинка/Скидка)</label>
+                        <input type="text" id="prodBadge" class="form-control" placeholder="Опционально">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Описание</label>
+                        <textarea id="prodDesc" class="form-control" rows="3" placeholder="Короткое описание"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Рейтинг (0-5)</label>
+                        <input type="number" step="0.1" id="prodRating" class="form-control" placeholder="Опционально">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Отзывы (кол-во)</label>
+                        <input type="number" id="prodReviews" class="form-control" placeholder="Опционально">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Остаток</label>
+                        <input type="number" id="prodStock" class="form-control" placeholder="Опционально">
+                    </div>
+
+                    <div class="form-group">
+                        <label>URL Картинки</label>
+                        <input type="url" id="prodImg" class="form-control" required placeholder="https://...">
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="submitBtn">Добавить товар</button>
+                    <button type="button" class="btn-primary btn-danger" id="cancelBtn" style="display: none;">Отмена</button>
+                </form>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+                <h4 style="margin-bottom: 10px;">Экспорт данных</h4>
+                <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Экспорт текущего каталога (JSON).</p>
+                <textarea id="jsonOutput" class="form-control" rows="5" readonly></textarea>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+                <h4 style="margin-bottom: 10px;">Импорт данных (Bulk)</h4>
+                <p style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">Вставь массив JSON и нажми «Импортировать».</p>
+                <textarea id="jsonImport" class="form-control" rows="6" placeholder='[{"name":"...","category":"...","price":1000,"img":"..."}]'></textarea>
+                <button type="button" class="btn-primary" id="importBtn" style="margin-top:10px;">Импортировать</button>
+            </div>
+        </aside>
+
+        <!-- Таблица товаров -->
+        <main class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Фото</th>
+                        <th>Название</th>
+                        <th>Категория</th>
+                        <th>Цена</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTableBody">
+                    <!-- JS render -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script type="module" src="assets/js/admin.js"></script>
+</body>
+</html>

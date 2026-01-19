@@ -1,0 +1,62 @@
+:root {
+    /* --- COLOR PALETTE (OKLCH - Modern Color Space) --- */
+
+    /* Base: Глубокий, дорогой черный (не #000) */
+    --color-primary: oklch(20% 0.02 260);
+
+    /* Surface: Теплый белый, "бумажный" оттенок. Глаза не устают. */
+    --color-bg: oklch(98% 0.003 100);
+    --color-surface: oklch(100% 0 0);
+
+    /* Accent: Благородная Медь/Охра. Выглядит дорого, в отличие от кислотного зеленого */
+    --color-accent: oklch(65% 0.15 50);
+    --color-accent-hover: oklch(55% 0.15 50);
+
+    /* Utility */
+    --text-primary: oklch(20% 0.02 260);
+    --text-secondary: oklch(55% 0.02 260);
+    --text-inverse: oklch(99% 0 0);
+
+    --border-light: oklch(92% 0.005 260);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+
+    /* --- TYPOGRAPHY (Fluid Type Scale) --- */
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Manrope', sans-serif;
+    --font-main: 'Manrope', sans-serif;
+
+    /* clamp(min, preferred, max) - шрифт сам растет с экраном */
+    --text-xs: clamp(0.75rem, 0.7vw, 0.8rem);
+    --text-sm: clamp(0.875rem, 0.9vw, 0.95rem);
+    --text-base: clamp(1rem, 1.1vw, 1.125rem);
+    --text-lg: clamp(1.25rem, 1.4vw, 1.5rem);
+    --text-xl: clamp(1.5rem, 2vw, 2rem);
+    --text-2xl: clamp(2rem, 3vw, 3rem);
+    --text-hero: clamp(3rem, 6vw, 5.5rem);
+
+    /* --- SPACING & LAYOUT --- */
+    --container-width: 1600px; /* Широкий контейнер для воздуха */
+    --header-height: 80px;
+
+    /* Neo-Brutalism radius: чуть меньше, чем раньше, строже */
+    --radius-sm: 4px;
+    --radius-md: 12px;
+    --radius-lg: 24px;
+    --radius-pill: 9999px;
+
+    /* --- EFFECTS --- */
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
+    --shadow-md: 0 12px 24px -6px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 20px oklch(65% 0.15 50 / 0.3);
+    --shadow-card: 0 15px 35px rgba(44, 62, 80, 0.1);
+
+    --transition-fast: 0.2s cubic-bezier(0.2, 0, 0, 1);
+    --transition-smooth: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    --transition-base: 0.3s ease;
+
+    /* Card & UI Sizes */
+    --font-size-card-title: 1rem;
+    --font-size-card-price: 1.25rem;
+}

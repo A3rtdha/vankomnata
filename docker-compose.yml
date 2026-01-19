@@ -1,0 +1,8 @@
+name: vancom
+services:
+  vancom:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app

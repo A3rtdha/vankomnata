@@ -53,15 +53,19 @@ if ($method === 'POST' && $action === 'import') {
         echo json_encode(['error' => 'Invalid payload'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $normalized = [];
-    $nextId = 1;
+    $products = readProducts($dataFile);
+    $maxId = 0;
+    foreach ($products as $p) {
+        if (isset($p['id']) && $p['id'] > $maxId) $maxId = $p['id'];
+    }
+    $nextId = $maxId + 1;
     foreach ($items as $item) {
         if (!is_array($item)) continue;
         $item['id'] = $nextId++;
-        $normalized[] = $item;
+        $products[] = $item;
     }
-    saveProducts($dataFile, $normalized);
-    echo json_encode($normalized, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    saveProducts($dataFile, $products);
+    echo json_encode($products, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 

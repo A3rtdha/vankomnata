@@ -7,21 +7,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ADMIN_LOGIN = 'admin';
     const ADMIN_PASSWORD = 'admin123';
     const tableBody = document.getElementById('adminTableBody');
-    const form = document.getElementById('productForm');
     const catList = document.getElementById('catList');
-    const jsonOutput = document.getElementById('jsonOutput');
-    const jsonImport = document.getElementById('jsonImport');
-    const importBtn = document.getElementById('importBtn');
     const productsCount = document.getElementById('productsCount');
-    const csvFile = document.getElementById('csvFile');
-    const csvDelimiter = document.getElementById('csvDelimiter');
-    const csvEncoding = document.getElementById('csvEncoding');
-    const previewCsvBtn = document.getElementById('previewCsvBtn');
-    const csvPreview = document.getElementById('csvPreview');
-    const importCsvBtn = document.getElementById('importCsvBtn');
     const importStatus = document.getElementById('importStatus');
     const importErrors = document.getElementById('importErrors');
-    const downloadCsvTemplate = document.getElementById('downloadCsvTemplate');
     const adminSearch = document.getElementById('adminSearch');
     const adminCategoryFilter = document.getElementById('adminCategoryFilter');
 
@@ -31,11 +20,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     const adminPassword = document.getElementById('adminPassword');
     const adminAuthError = document.getElementById('adminAuthError');
 
-    let csvItems = [];
-    let csvRowErrors = [];
-    let allProducts = [];
+    const openAddModalBtn = document.getElementById('openAddModal');
+    const addModal = document.getElementById('addModal');
+    const closeAddModal = document.getElementById('closeAddModal');
+    const singleForm = document.getElementById('singleForm');
+    const singleModeManual = document.getElementById('singleModeManual');
+    const singleModeJson = document.getElementById('singleModeJson');
+    const singleManualBlock = document.getElementById('singleManualBlock');
+    const singleJsonBlock = document.getElementById('singleJsonBlock');
+    const singleJsonInput = document.getElementById('singleJsonInput');
+    const singleJsonImgFile = document.getElementById('singleJsonImgFile');
+    const prodImgFile = document.getElementById('prodImgFile');
+    const prodId = document.getElementById('prodId');
+    const submitBtn = document.getElementById('submitBtn');
+    const bulkJsonInput = document.getElementById('bulkJsonInput');
+    const bulkImages = document.getElementById('bulkImages');
+    const bulkImportBtn = document.getElementById('bulkImportBtn');
+    const tabButtons = addModal.querySelectorAll('.tab-btn');
+    const tabContents = addModal.querySelectorAll('.tab-content');
 
-    // --- Рендеринг таблицы ---
+    let allProducts = [];
+    let singleMode = 'manual';
+
+    const applyTableFilters = (products) => {
+        const query = (adminSearch.value || '').trim().toLowerCase();
+        const category = adminCategoryFilter.value;
+        return products.filter(p => {
+            const matchName = !query || p.name.toLowerCase().includes(query);
+            const matchCat = category === 'all' || p.category === category;
+            return matchName && matchCat;
+        });
+    };
+
     async function renderTable() {
         await productService.load();
         allProducts = productService.getAll();
@@ -59,20 +75,85 @@ document.addEventListener('DOMContentLoaded', async () => {
             </tr>
         `).join('');
 
-        // Обновляем список категорий для подсказок
         const categories = [...new Set(allProducts.map(p => p.category))];
         catList.innerHTML = categories.map(c => `<option value="${c}">`).join('');
         adminCategoryFilter.innerHTML = ['<option value="all">Все категории</option>', ...categories.map(c => `<option value="${c}">${c}</option>`)].join('');
-
-        // Обновляем поле экспорта
-        jsonOutput.value = productService.exportToJSON();
     }
 
-    // --- Обработка формы ---
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    const setStatus = (message, type) => {
+        importStatus.textContent = message;
+        importStatus.className = `status-line ${type || ''}`.trim();
+    };
 
-        const id = document.getElementById('prodId').value;
+    const clearStatus = () => {
+        importStatus.textContent = '';
+        importErrors.textContent = '';
+    };
+
+    const normalizeJsonInput = (raw) => {
+        const trimmed = raw.trim().replace(/^\uFEFF/, '');
+        if (!trimmed) return '';
+        if (trimmed.startsWith('export')) {
+            const start = trimmed.indexOf('[');
+            const end = trimmed.lastIndexOf(']');
+            if (start !== -1 && end !== -1 && end > start) {
+                return trimmed.slice(start, end + 1);
+            }
+        }
+        return trimmed;
+    };
+
+    const uploadImage = async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/api/upload.php', {
+            method: 'POST',
+            body: formData
+        });
+        const text = await res.text();
+        if (!text.trim()) throw new Error('Пустой ответ от сервера');
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (err) {
+            throw new Error('Некорректный ответ сервера');
+        }
+        if (!res.ok || !data.url) {
+            throw new Error(data.error || 'Ошибка загрузки');
+        }
+        return data.url;
+    };
+
+    const uploadImages = async (files) => {
+        const map = new Map();
+        const list = Array.from(files || []);
+        for (const file of list) {
+            const url = await uploadImage(file);
+            map.set(file.name, url);
+        }
+        return map;
+    };
+
+    const setSingleMode = (mode) => {
+        singleMode = mode;
+        singleManualBlock.style.display = mode === 'manual' ? 'block' : 'none';
+        singleJsonBlock.style.display = mode === 'json' ? 'block' : 'none';
+    };
+
+    const setTab = (tab) => {
+        tabButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tab));
+        tabContents.forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+    };
+
+    const resetSingleForm = () => {
+        singleForm.reset();
+        prodId.value = '';
+        submitBtn.textContent = 'Добавить товар';
+        singleJsonInput.value = '';
+        if (singleJsonImgFile) singleJsonImgFile.value = '';
+    };
+
+    const buildManualProductData = () => {
         const productData = {
             name: document.getElementById('prodName').value,
             category: document.getElementById('prodCategory').value,
@@ -85,29 +166,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             stock: document.getElementById('prodStock').value ? Number(document.getElementById('prodStock').value) : undefined,
             img: document.getElementById('prodImg').value
         };
-
         Object.keys(productData).forEach((key) => {
             if (productData[key] === undefined) delete productData[key];
         });
+        return productData;
+    };
 
-        if (id) {
-            // Редактирование
-            await productService.update(id, productData);
-        } else {
-            // Создание
-            await productService.add(productData);
-        }
-
-        resetForm();
-        await renderTable();
-    });
-
-    // --- Хелперы ---
     window.editProduct = (id) => {
         const p = productService.getById(id);
         if (!p) return;
-
-        document.getElementById('prodId').value = p.id;
+        openModal();
+        setTab('single');
+        setSingleMode('manual');
+        prodId.value = p.id;
         document.getElementById('prodName').value = p.name;
         document.getElementById('prodCategory').value = p.category;
         document.getElementById('prodPrice').value = p.price;
@@ -118,208 +189,115 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('prodReviews').value = p.reviews ?? '';
         document.getElementById('prodStock').value = p.stock ?? '';
         document.getElementById('prodImg').value = p.img;
-
-        document.getElementById('formTitle').innerText = 'Редактирование товара';
-        document.getElementById('submitBtn').innerText = 'Сохранить';
-        document.getElementById('submitBtn').style.background = '#3498db';
-        document.getElementById('cancelBtn').style.display = 'inline-block';
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        submitBtn.textContent = 'Сохранить';
     };
 
     window.deleteProduct = async (id) => {
-        if(confirm('Точно удалить этот товар?')) {
+        if (confirm('Точно удалить этот товар?')) {
             await productService.delete(id);
             await renderTable();
         }
     };
 
-    function resetForm() {
-        form.reset();
-        document.getElementById('prodId').value = '';
-        document.getElementById('formTitle').innerText = 'Новый товар';
-        document.getElementById('submitBtn').innerText = 'Добавить товар';
-        document.getElementById('submitBtn').style.background = '';
-        document.getElementById('cancelBtn').style.display = 'none';
-    }
-
-    document.getElementById('cancelBtn').addEventListener('click', resetForm);
-
-    importBtn.addEventListener('click', async () => {
+    singleForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         try {
-            const parsed = JSON.parse(jsonImport.value || '[]');
-            if (!Array.isArray(parsed)) {
-                alert('Ожидается массив JSON');
+            clearStatus();
+            const id = prodId.value;
+            let productData;
+            if (singleMode === 'json') {
+                const raw = normalizeJsonInput(singleJsonInput.value || '');
+                if (!raw) {
+                    setStatus('Пустой JSON', 'error');
+                    return;
+                }
+                productData = JSON.parse(raw);
+                const file = singleJsonImgFile.files?.[0];
+                if (file) {
+                    setStatus('Загрузка изображения...', '');
+                    productData.img = await uploadImage(file);
+                }
+            } else {
+                productData = buildManualProductData();
+                const file = prodImgFile.files?.[0];
+                if (file) {
+                    setStatus('Загрузка изображения...', '');
+                    productData.img = await uploadImage(file);
+                }
+            }
+
+            if (id) {
+                await productService.update(id, productData);
+                setStatus('Товар обновлен', 'success');
+            } else {
+                await productService.add(productData);
+                setStatus('Товар добавлен', 'success');
+            }
+            await renderTable();
+            closeModal();
+        } catch (err) {
+            setStatus(`Ошибка: ${err.message}`, 'error');
+        }
+    });
+
+    bulkImportBtn.addEventListener('click', async () => {
+        try {
+            clearStatus();
+            const raw = normalizeJsonInput(bulkJsonInput.value || '');
+            if (!raw) {
+                setStatus('Пустой JSON', 'error');
                 return;
             }
-            await productService.importBulk(parsed);
-            jsonImport.value = '';
+            const parsed = JSON.parse(raw);
+            const items = Array.isArray(parsed) ? parsed : [parsed];
+            if (!items.length) {
+                setStatus('Пустой JSON', 'error');
+                return;
+            }
+            const fileMap = await uploadImages(bulkImages.files);
+            const errors = [];
+            const normalized = items.map((item, idx) => {
+                const imageKey = item.imageFile || item.img;
+                if (imageKey && fileMap.has(imageKey)) {
+                    item.img = fileMap.get(imageKey);
+                }
+                if (!item.name || !item.category || !item.price) {
+                    errors.push(`Строка ${idx + 1}: нет обязательных полей (name, category, price)`);
+                }
+                return item;
+            });
+            if (errors.length) {
+                importErrors.textContent = errors.slice(0, 5).join(' | ');
+                setStatus('Исправь ошибки в JSON', 'error');
+                return;
+            }
+            await productService.importBulk(normalized);
+            setStatus('Bulk импорт успешен', 'success');
+            bulkJsonInput.value = '';
+            bulkImages.value = '';
             await renderTable();
+            closeModal();
         } catch (err) {
-            alert('Неверный JSON');
+            setStatus(`Ошибка: ${err.message}`, 'error');
         }
     });
 
-    const parseCsvLine = (line, delimiter) => {
-        const values = [];
-        let current = '';
-        let inQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-            const ch = line[i];
-            const next = line[i + 1];
-            if (ch === '"' && next === '"') {
-                current += '"';
-                i++;
-                continue;
-            }
-            if (ch === '"') {
-                inQuotes = !inQuotes;
-                continue;
-            }
-            if (ch === delimiter && !inQuotes) {
-                values.push(current);
-                current = '';
-                continue;
-            }
-            current += ch;
-        }
-        values.push(current);
-        return values.map(v => v.trim());
+    const openModal = () => {
+        addModal.style.display = 'flex';
+        clearStatus();
     };
 
-    const toNumber = (value) => {
-        if (value === undefined || value === null || value === '') return undefined;
-        const normalized = String(value).replace(/\s/g, '').replace(',', '.');
-        const num = Number(normalized);
-        return Number.isFinite(num) ? num : undefined;
+    const closeModal = () => {
+        addModal.style.display = 'none';
+        resetSingleForm();
+        clearStatus();
     };
 
-    const parseCsv = (text, delimiter) => {
-        const lines = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n').filter(Boolean);
-        if (lines.length === 0) return { items: [], errors: ['Файл пустой'] };
-        let startIndex = 0;
-        let activeDelimiter = delimiter;
-        if (lines[0].toLowerCase().startsWith('sep=')) {
-            activeDelimiter = lines[0].slice(4, 5);
-            startIndex = 1;
-        }
-        const headers = parseCsvLine(lines[startIndex], activeDelimiter)
-            .map(h => h.replace(/^\uFEFF/, '').trim());
-        const rows = [];
-        const errors = [];
-        for (let i = startIndex + 1; i < lines.length; i++) {
-            const values = parseCsvLine(lines[i], activeDelimiter);
-            if (values.every(v => v === '')) continue;
-            const item = {};
-            headers.forEach((key, idx) => {
-                item[key] = values[idx] ?? '';
-            });
-            rows.push({ item, line: i + 1 });
-        }
-        const items = rows.map(({ item, line }) => {
-            const mapped = {
-                name: item.name || item.title || '',
-                category: item.category || '',
-                price: toNumber(item.price),
-                oldPrice: toNumber(item.oldPrice),
-                badge: item.badge || undefined,
-                desc: item.desc || item.description || undefined,
-                rating: toNumber(item.rating),
-                reviews: toNumber(item.reviews),
-                stock: toNumber(item.stock),
-                img: item.img || item.image || item.photo || ''
-            };
-            Object.keys(mapped).forEach((key) => {
-                if (mapped[key] === undefined || mapped[key] === '') delete mapped[key];
-            });
-            const missing = [];
-            if (!mapped.name) missing.push('name');
-            if (!mapped.category) missing.push('category');
-            if (!mapped.price) missing.push('price');
-            if (!mapped.img) missing.push('img');
-            if (missing.length) {
-                errors.push(`Строка ${line}: нет ${missing.join(', ')}`);
-            }
-            return mapped;
-        }).filter(item => item.name && item.category && item.price && item.img);
-        return { items, errors };
-    };
-
-    const setStatus = (message, type) => {
-        importStatus.textContent = message;
-        importStatus.className = `status-line ${type || ''}`.trim();
-    };
-
-    const loadCsvFile = async (file) => {
-        const buffer = await file.arrayBuffer();
-        const decoder = new TextDecoder(csvEncoding.value || 'utf-8');
-        const text = decoder.decode(buffer);
-        const delimiter = csvDelimiter.value;
-        const result = parseCsv(text, delimiter);
-        csvItems = result.items;
-        csvRowErrors = result.errors;
-        setStatus(`CSV загружен: ${csvItems.length} товаров`, csvItems.length ? 'success' : 'error');
-        importErrors.textContent = csvRowErrors.slice(0, 5).join(' | ');
-        const previewRows = csvItems.slice(0, 3);
-        csvPreview.value = previewRows.map((item, index) => `${index + 1}. ${item.name} | ${item.category} | ${item.price} ₽`).join('\n');
-    };
-
-    csvFile.addEventListener('change', async () => {
-        const file = csvFile.files?.[0];
-        if (!file) return;
-        await loadCsvFile(file);
-    });
-
-    previewCsvBtn.addEventListener('click', async () => {
-        if (csvFile.files?.[0]) {
-            await loadCsvFile(csvFile.files[0]);
-        } else {
-            setStatus('Сначала выберите CSV файл', 'error');
-        }
-    });
-
-    importCsvBtn.addEventListener('click', async () => {
-        if (!csvItems.length) {
-            setStatus('Нет данных для импорта', 'error');
-            return;
-        }
-        if (csvRowErrors.length) {
-            setStatus('Есть ошибки в CSV. Исправьте и повторите импорт.', 'error');
-            return;
-        }
-        await productService.importBulk(csvItems);
-        csvItems = [];
-        csvRowErrors = [];
-        csvFile.value = '';
-        csvPreview.value = '';
-        importErrors.textContent = '';
-        setStatus('CSV импортирован успешно', 'success');
-        await renderTable();
-    });
-
-    downloadCsvTemplate.addEventListener('click', () => {
-        const delimiter = csvDelimiter.value;
-        const header = ['name', 'category', 'price', 'img', 'oldPrice', 'badge', 'desc', 'rating', 'reviews', 'stock'].join(delimiter);
-        const row = ['Мыльница', 'Аксессуары', '1200', 'https://example.com/img.jpg', '1500', 'Хит', 'Короткое описание', '4.7', '12', '5'].join(delimiter);
-        const csv = `sep=${delimiter}\n${header}\n${row}\n`;
-        const bom = '\uFEFF';
-        const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'products-template.csv';
-        link.click();
-        URL.revokeObjectURL(link.href);
-    });
-
-    const applyTableFilters = (products) => {
-        const query = (adminSearch.value || '').trim().toLowerCase();
-        const category = adminCategoryFilter.value;
-        return products.filter(p => {
-            const matchName = !query || p.name.toLowerCase().includes(query);
-            const matchCat = category === 'all' || p.category === category;
-            return matchName && matchCat;
-        });
-    };
+    singleModeManual.addEventListener('click', () => setSingleMode('manual'));
+    singleModeJson.addEventListener('click', () => setSingleMode('json'));
+    tabButtons.forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
+    openAddModalBtn.addEventListener('click', openModal);
+    closeAddModal.addEventListener('click', closeModal);
 
     adminSearch.addEventListener('input', async () => {
         await renderTable();
@@ -347,7 +325,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     checkAuth();
-
-    // Первичный рендер
+    setSingleMode('manual');
+    setTab('single');
     await renderTable();
 });

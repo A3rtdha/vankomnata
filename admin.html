@@ -56,6 +56,7 @@
             width: 100%; padding: 10px 12px; border: 1px solid var(--admin-border);
             border-radius: 10px; font-family: inherit; background: #fff;
             transition: border-color 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
         }
         .form-control:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
 
@@ -98,6 +99,13 @@
             padding: 24px; box-shadow: var(--admin-shadow); border: 1px solid var(--admin-border);
         }
         .admin-auth-card h3 { margin-bottom: 8px; }
+        .admin-auth-card.modal-card {
+            width: 100%;
+            max-width: 720px;
+            max-height: 86vh;
+            overflow-x: hidden;
+            overflow: auto;
+        }
 
         .tab-buttons { display: flex; gap: 10px; border-bottom: 1px solid var(--admin-border); margin-bottom: 12px; }
         .tab-btn {
@@ -168,7 +176,7 @@
     </div>
 
     <div class="admin-auth" id="addModal" style="display:none;">
-        <div class="admin-auth-card" style="width: 720px;">
+        <div class="admin-auth-card modal-card" style="width: 720px;">
             <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:10px;">
                 <h3>Добавление товаров</h3>
                 <button class="action-btn" id="closeAddModal">&times;</button>
@@ -228,7 +236,7 @@
                         </div>
                         <div class="form-group">
                             <label>URL Картинки</label>
-                            <input type="url" id="prodImg" class="form-control" required placeholder="https://...">
+                        <input type="url" id="prodImg" class="form-control" placeholder="https://...">
                         </div>
                         <div class="form-group">
                             <label>Загрузка картинки</label>

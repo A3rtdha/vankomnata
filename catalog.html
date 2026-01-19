@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Каталог сантехники - Ванная комната. Смесители, душевые кабины, ванны и аксессуары.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#0f1d2d">
+    <title>Каталог | Ванная комната</title>
+
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/variables.css">
+    <link rel="stylesheet" href="assets/css/app.css">
+
+    <!-- JS -->
+    <script type="module" src="assets/js/catalog.js" defer></script>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="header-container container">
+            <!-- GEO -->
+            <button class="geo-trigger" id="geoBtn">
+                <span class="geo-dot"></span>
+                <span id="currentCity" class="geo-text">Новосибирск</span>
+            </button>
+
+            <!-- LOGO -->
+            <a href="index.html" class="logo logo-img" aria-label="Ванная комната">
+                <img src="uploads/1.png" alt="Ванная комната">
+            </a>
+
+            <!-- ACTIONS -->
+            <div class="header-actions">
+                <button class="icon-btn" id="authBtn" aria-label="Профиль">
+                    <i class="fas fa-user"></i>
+                </button>
+                <button class="icon-btn cart-trigger-btn" id="openCartBtn" aria-label="Корзина">
+                    <span class="btn-label">Корзина</span>
+                    <span class="cart-badge" id="cartCount">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- CATALOG HERO HEADER -->
+        <section class="catalog-hero">
+            <!-- Animated Background -->
+            <div class="catalog-hero-bg">
+                <div class="gradient-orb orb-1"></div>
+                <div class="gradient-orb orb-2"></div>
+                <div class="gradient-orb orb-3"></div>
+            </div>
+            
+            <!-- Floating Elements -->
+            <div class="floating-shapes">
+                <div class="shape shape-1"></div>
+                <div class="shape shape-2"></div>
+                <div class="shape shape-3"></div>
+            </div>
+
+            <div class="container catalog-hero-content">
+                <nav class="breadcrumb-modern">
+                    <a href="index.html" class="breadcrumb-link">
+                        <i class="fas fa-home"></i>
+                        <span>Главная</span>
+                    </a>
+                    <span class="breadcrumb-sep">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                    </span>
+                    <span class="breadcrumb-current" id="breadcrumbCategory">Каталог</span>
+                </nav>
+
+                <div class="catalog-hero-text">
+                    <h1 class="catalog-title" id="catalogTitle">
+                        <span class="title-line">Каталог</span>
+                    </h1>
+                    <p class="catalog-subtitle">
+                        Откройте коллекцию премиальной сантехники и аксессуаров
+                    </p>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="catalog-stats">
+                    <div class="stat-pill">
+                        <i class="fas fa-cube"></i>
+                        <span id="totalProducts">0</span> товаров
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fas fa-tags"></i>
+                        <span id="totalCategories">0</span> категорий
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fas fa-truck"></i>
+                        Доставка от 800 ₽
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CATALOG SECTION -->
+        <section class="catalog-main" id="catalog">
+            <div class="container">
+                <div class="catalog-layout">
+                    <!-- MODERN SIDEBAR -->
+                    <aside class="sidebar-glass">
+                        <!-- FIXED TOP SECTION -->
+                        <div class="sidebar-fixed-top">
+                            <div class="sidebar-header">
+                                <div class="sidebar-header-left">
+                                    <a href="index.html" class="back-home-btn" title="На главную">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </a>
+                                    <span class="sidebar-title">Фильтры</span>
+                                </div>
+                                <button class="sidebar-reset" id="resetFilters" title="Сбросить фильтры">
+                                    <i class="fas fa-redo-alt"></i>
+                                </button>
+                            </div>
+
+                            <!-- Search with animation -->
+                            <div class="filter-group">
+                                <div class="search-box">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" id="searchInput" class="search-input" placeholder="Поиск товаров...">
+                                    <div class="search-line"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SCROLLABLE CATEGORIES SECTION -->
+                        <div class="sidebar-scrollable">
+                            <!-- Categories with count -->
+                            <div class="filter-group">
+                                <div class="filter-header" data-toggle="categories">
+                                    <span class="filter-title">Категории</span>
+                                    <i class="fas fa-chevron-down filter-toggle"></i>
+                                </div>
+                                <ul class="filter-list" id="sidebarCategories">
+                                    <!-- JS Render -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- FIXED BOTTOM SECTION -->
+                        <div class="sidebar-fixed-bottom">
+                            <!-- Price Range Slider Style -->
+                            <div class="filter-group">
+                                <div class="filter-header">
+                                    <span class="filter-title">Цена</span>
+                                </div>
+                                <div class="price-inputs">
+                                    <div class="price-field">
+                                        <span class="price-label">От</span>
+                                        <input type="number" id="priceMin" placeholder="0">
+                                        <span class="price-currency">₽</span>
+                                    </div>
+                                    <div class="price-divider"></div>
+                                    <div class="price-field">
+                                        <span class="price-label">До</span>
+                                        <input type="number" id="priceMax" placeholder="∞">
+                                        <span class="price-currency">₽</span>
+                                    </div>
+                                </div>
+                                <div class="price-slider">
+                                    <div class="price-track"></div>
+                                    <div class="price-range"></div>
+                                    <input type="range" id="priceRangeMin" class="price-range-input" min="0" max="100000" value="0" step="1000" aria-label="Минимальная цена">
+                                    <input type="range" id="priceRangeMax" class="price-range-input" min="0" max="100000" value="100000" step="1000" aria-label="Максимальная цена">
+                                </div>
+                                <button class="apply-btn" id="applyFiltersBtn">
+                                    <span>Применить</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- PRODUCTS AREA -->
+                    <div class="products-area">
+                        <!-- Toolbar -->
+                        <div class="products-toolbar">
+                            <div class="results-info">
+                                <span class="results-count" id="resultsCount">Загрузка...</span>
+                            </div>
+                            <div class="view-controls">
+                                <button class="view-btn active" data-view="grid" aria-label="Сетка">
+                                    <i class="fas fa-th"></i>
+                                </button>
+                                <button class="view-btn" data-view="list" aria-label="Список">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Products Grid -->
+                        <div class="products-grid products-grid-modern" id="productsGrid">
+                            <!-- JS Render -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo" style="margin-bottom: 15px;">Ванная Комната</div>
+                    <p style="color: #999; margin-bottom: 10px;">Премиальные аксессуары для создания идеальной ванной комнаты</p>
+                </div>
+
+                <div class="footer-section">
+                    <h4 style="color: #fff; margin-bottom: 15px; font-weight: 600;">Контакты</h4>
+                    <div style="color: #ccc; font-size: 0.9em;">
+                        <p style="margin-bottom: 5px;"><i class="fas fa-phone" style="margin-right: 8px;"></i>+7 (383) 299-06-67</p>
+                        <p style="margin-bottom: 5px;"><i class="fas fa-envelope" style="margin-right: 8px;"></i>van-komnata@mail.ru</p>
+                        <p><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>Новосибирск, Россия</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px;">
+                    <p style="color: #777; font-size: 0.85em;">&copy; 2026 Ванная комната. Все права защищены.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast" role="alert">Товар добавлен в корзину!</div>
+
+    <!-- CART SIDEBAR -->
+    <div class="cart-overlay" id="cartOverlay"></div>
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Корзина</h3>
+            <button class="close-cart" id="closeCart">&times;</button>
+        </div>
+        <div class="cart-body" id="cartItemsContainer"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Итого:</span>
+                <span id="cartTotalSum">0 ₽</span>
+            </div>
+            <button class="btn btn-block" id="checkoutBtn">Оформить заказ</button>
+        </div>
+    </aside>
+
+    <!-- MODALS -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-window">
+            <button class="modal-close" onclick="toggleModal('loginModal', false)">&times;</button>
+            <h2 class="modal-title">Вход в систему</h2>
+            <form id="loginForm">
+                <div class="input-group">
+                    <input type="text" id="username" class="input-field" placeholder="Логин" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" class="input-field" placeholder="Пароль" required>
+                </div>
+                <div id="loginError" class="form-error" role="alert"></div>
+                <button type="submit" class="btn btn-block">Войти</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="userModal">
+        <div class="modal-window">
+            <button class="modal-close" onclick="toggleModal('userModal', false)">&times;</button>
+            <h2 class="modal-title">Привет, <span id="userNameDisplay">User</span>! 👋</h2>
+            <div class="user-stat-card">
+                <div class="user-stat-val" id="userInterest">...</div>
+                <div class="user-stat-label">Ваша любимая категория</div>
+            </div>
+            <button onclick="authService.logout()" class="btn btn-block" style="background: #e74c3c;">Выйти</button>
+        </div>
+    </div>
+
+</body>
+</html>

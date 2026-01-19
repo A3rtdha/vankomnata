@@ -18,9 +18,11 @@
 <body>
     <header class="site-header">
         <div class="header-container container">
-            <a href="index.html" class="logo">Ванная комната <sup>1</sup></a>
+            <a href="index.html" class="logo logo-img" aria-label="Ванная комната">
+                <img src="uploads/1.png" alt="Ванная комната">
+            </a>
             <div class="header-actions">
-                <a href="index.html#catalog" class="btn-outline" style="padding:10px 16px; text-decoration:none;">В каталог</a>
+                <a href="catalog.html" class="btn-outline" style="padding:10px 16px; text-decoration:none;">В каталог</a>
                 <button class="icon-btn cart-trigger-btn" id="openCartBtn" aria-label="Корзина">
                     <span class="btn-label">Корзина</span>
                     <span class="cart-badge" id="cartCount">0</span>
@@ -33,7 +35,7 @@
         <nav class="breadcrumb" aria-label="breadcrumb">
             <a href="index.html">Главная</a>
             <span>›</span>
-            <a href="index.html#catalog">Каталог</a>
+            <a href="catalog.html">Каталог</a>
             <span>›</span>
             <span id="productCrumb">Товар</span>
         </nav>
@@ -111,7 +113,7 @@
                 <div class="footer-section">
                     <h4 style="color: #fff; margin-bottom: 15px; font-weight: 600;">Информация</h4>
                     <ul class="footer-links">
-                        <li><a href="index.html#catalog" style="color: #ccc; text-decoration: none;">Каталог</a></li>
+                        <li><a href="catalog.html" style="color: #ccc; text-decoration: none;">Каталог</a></li>
                         <li><a href="index.html" style="color: #ccc; text-decoration: none;">Главная</a></li>
                     </ul>
                 </div>

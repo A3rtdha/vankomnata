@@ -2,7 +2,7 @@ export const products = [
     {
         id: 1,
         name: "Мраморный диспенсер",
-        category: "Аксессуары",
+        category: "Дозаторы",
         price: 1200,
         oldPrice: 1500,
         badge: "Хит",
@@ -15,7 +15,7 @@ export const products = [
     {
         id: 2,
         name: "Бамбуковый органайзер",
-        category: "Хранение",
+        category: "Полки",
         price: 2500,
         badge: "Новинка",
         rating: 4.6,
@@ -27,7 +27,7 @@ export const products = [
     {
         id: 3,
         name: "Набор полотенец Soft",
-        category: "Текстиль",
+        category: "Полотенцесушители",
         price: 3800,
         oldPrice: 4500,
         badge: "Скидка",
@@ -39,19 +39,19 @@ export const products = [
     },
     {
         id: 4,
-        name: "Ароматическая свеча Zen",
-        category: "Атмосфера",
+        name: "Ароматический набор",
+        category: "Держатели",
         price: 900,
         rating: 4.4,
         reviews: 41,
         stock: 24,
-        desc: "Теплый древесный аромат, чистое горение без копоти.",
+        desc: "Современный держатель для аромадиффузоров.",
         img: "https://images.unsplash.com/photo-1602825485432-69933029f821?auto=format&fit=crop&w=800&q=80"
     },
     {
         id: 5,
         name: "Зеркало с подсветкой",
-        category: "Интерьер",
+        category: "Зеркала",
         price: 8500,
         badge: "Хит",
         rating: 4.7,
@@ -63,7 +63,7 @@ export const products = [
     {
         id: 6,
         name: "Золотая мыльница",
-        category: "Аксессуары",
+        category: "Мыльницы",
         price: 1500,
         rating: 4.3,
         reviews: 32,
@@ -74,7 +74,7 @@ export const products = [
     {
         id: 7,
         name: "Душевая кабина Luxe",
-        category: "Сантехника",
+        category: "Угловые",
         price: 25000,
         badge: "Премиум",
         rating: 4.9,
@@ -82,5 +82,99 @@ export const products = [
         stock: 2,
         desc: "Закаленное стекло, плавная фурнитура и современный дизайн.",
         img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        id: 8,
+        name: "Акриловая ванна Premium",
+        category: "Акриловые ванны",
+        price: 32000,
+        badge: "Новинка",
+        rating: 4.8,
+        reviews: 45,
+        stock: 3,
+        desc: "Премиальная акриловая ванна с гидромассажем.",
+        img: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        id: 9,
+        name: "Смеситель для раковины Chrome",
+        category: "Для раковины",
+        price: 4500,
+        badge: "Хит",
+        rating: 4.6,
+        reviews: 89,
+        stock: 15,
+        desc: "Хромированный смеситель с керамическим картриджем.",
+        img: "https://images.unsplash.com/photo-1585241645927-c7a8e5840c42?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        id: 10,
+        name: "Унитаз подвесной Modern",
+        category: "Унитазы",
+        price: 18500,
+        rating: 4.9,
+        reviews: 67,
+        stock: 8,
+        desc: "Подвесной унитаз с микролифтом и системой антивсплеск.",
+        img: "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        id: 11,
+        name: "Керамическая плитка Marmo",
+        category: "Настенная плитка",
+        price: 2200,
+        oldPrice: 2800,
+        badge: "Скидка",
+        rating: 4.7,
+        reviews: 124,
+        stock: 50,
+        desc: "Настенная керамическая плитка с имитацией мрамора.",
+        img: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        id: 12,
+        name: "Полотенцесушитель электрический",
+        category: "Электрические",
+        price: 6800,
+        rating: 4.5,
+        reviews: 38,
+        stock: 12,
+        desc: "Электрический полотенцесушитель с терморегулятором.",
+        img: "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        id: 13,
+        name: "Тумба под раковину Oak",
+        category: "Тумбы",
+        price: 12500,
+        badge: "Новинка",
+        rating: 4.8,
+        reviews: 56,
+        stock: 6,
+        desc: "Тумба из массива дуба с влагостойким покрытием.",
+        img: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        id: 14,
+        name: "Душевая система Rain",
+        category: "Душевые системы",
+        price: 15800,
+        badge: "Премиум",
+        rating: 5.0,
+        reviews: 92,
+        stock: 5,
+        desc: "Душевая система с верхним душем и ручной лейкой.",
+        img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        id: 15,
+        name: "Раковина накладная Ceramic",
+        category: "Раковины",
+        price: 7200,
+        rating: 4.6,
+        reviews: 74,
+        stock: 10,
+        desc: "Керамическая накладная раковина круглой формы.",
+        img: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=80"
     }
 ];

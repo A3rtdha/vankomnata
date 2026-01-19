@@ -1,24 +1,29 @@
 :root {
-    /* --- COLOR PALETTE (OKLCH - Modern Color Space) --- */
+    /* --- COLOR PALETTE (Aqua / Bathroom Vibes) --- */
+    /* Использую OKLCH для премиального, насыщенного цвета */
 
-    /* Base: Глубокий, дорогой черный (не #000) */
-    --color-primary: oklch(20% 0.02 260);
+    /* Primary: Глубокий чернильный синий — "дорогой" тёмный */
+    --color-primary: oklch(17% 0.05 240);
 
-    /* Surface: Теплый белый, "бумажный" оттенок. Глаза не устают. */
-    --color-bg: oklch(98% 0.003 100);
+    /* Surface: Чистый белый с едва заметным холодным оттенком */
+    --color-bg: oklch(98.5% 0.006 220);
     --color-surface: oklch(100% 0 0);
 
-    /* Accent: Благородная Медь/Охра. Выглядит дорого, в отличие от кислотного зеленого */
-    --color-accent: oklch(65% 0.15 50);
-    --color-accent-hover: oklch(55% 0.15 50);
+    /* Accent: Холодный сине-серый (в духе ванных комнат) */
+    --color-accent: rgb(66, 95, 127);
+    --color-accent-hover: rgb(52, 80, 110);
+    --color-accent-light: rgb(214, 226, 238);
+
+    /* Secondary Accent: Мягкий морской синий (для градиентов) */
+    --color-secondary: oklch(50% 0.12 230);
 
     /* Utility */
-    --text-primary: oklch(20% 0.02 260);
-    --text-secondary: oklch(55% 0.02 260);
+    --text-primary: oklch(17% 0.05 240);
+    --text-secondary: oklch(45% 0.03 240);
     --text-inverse: oklch(99% 0 0);
 
-    --border-light: oklch(92% 0.005 260);
-    --glass-bg: rgba(255, 255, 255, 0.7);
+    --border-light: oklch(90% 0.01 220);
+    --glass-bg: rgba(255, 255, 255, 0.75);
     --glass-border: 1px solid rgba(255, 255, 255, 0.6);
 
     /* --- TYPOGRAPHY (Fluid Type Scale) --- */
@@ -36,21 +41,21 @@
     --text-hero: clamp(3rem, 6vw, 5.5rem);
 
     /* --- SPACING & LAYOUT --- */
-    --container-width: 1600px; /* Широкий контейнер для воздуха */
-    --header-height: 80px;
+    --container-width: 1600px;
+    --header-height: 90px;
 
-    /* Neo-Brutalism radius: чуть меньше, чем раньше, строже */
+    /* Modern radius */
     --radius-sm: 4px;
     --radius-md: 12px;
     --radius-lg: 24px;
     --radius-pill: 9999px;
 
     /* --- EFFECTS --- */
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.02);
-    --shadow-md: 0 12px 24px -6px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 24px 48px -12px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0 0 20px oklch(65% 0.15 50 / 0.3);
-    --shadow-card: 0 15px 35px rgba(44, 62, 80, 0.1);
+    --shadow-sm: 0 2px 4px rgba(0, 28, 60, 0.04);
+    --shadow-md: 0 12px 24px -6px rgba(0, 28, 60, 0.1);
+    --shadow-lg: 0 24px 48px -12px rgba(0, 28, 60, 0.14);
+    --shadow-glow: 0 0 25px rgba(66, 95, 127, 0.35);
+    --shadow-card: 0 15px 35px rgba(0, 28, 60, 0.1);
 
     --transition-fast: 0.2s cubic-bezier(0.2, 0, 0, 1);
     --transition-smooth: 0.4s cubic-bezier(0.22, 1, 0.36, 1);

@@ -20,8 +20,18 @@ if (!isset($_FILES['file'])) {
 
 $file = $_FILES['file'];
 if ($file['error'] !== UPLOAD_ERR_OK) {
+    $errorMap = [
+        UPLOAD_ERR_INI_SIZE => 'Файл больше лимита upload_max_filesize (' . ini_get('upload_max_filesize') . ')',
+        UPLOAD_ERR_FORM_SIZE => 'Файл больше лимита формы',
+        UPLOAD_ERR_PARTIAL => 'Файл загружен частично',
+        UPLOAD_ERR_NO_FILE => 'Файл не выбран',
+        UPLOAD_ERR_NO_TMP_DIR => 'Не найдена временная папка',
+        UPLOAD_ERR_CANT_WRITE => 'Не удалось записать файл на диск',
+        UPLOAD_ERR_EXTENSION => 'Загрузка остановлена расширением PHP'
+    ];
+    $detail = $errorMap[$file['error']] ?? 'Неизвестная ошибка загрузки';
     http_response_code(400);
-    echo json_encode(['error' => 'Upload error'], JSON_UNESCAPED_UNICODE);
+    echo json_encode(['error' => 'Upload error: ' . $detail], JSON_UNESCAPED_UNICODE);
     exit;
 }
 

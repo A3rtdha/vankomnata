@@ -184,35 +184,99 @@ export const updateCartCounter = (service) => {
 
 // Словарь иконок для категорий (маппинг)
 const categoryIcons = {
-    'Все': 'fa-layer-group',
-    'Аксессуары': 'fa-soap',
-    'Хранение': 'fa-box-open',
-    'Текстиль': 'fa-tshirt', // или fa-rug
-    'Атмосфера': 'fa-fire',
-    'Интерьер': 'fa-couch', // или fa-lightbulb
-    'Сантехника': 'fa-faucet', // на случай расширения
-    'Ванны': 'fa-bath'
+    'all': 'fa-layer-group',
+    'accessories': 'fa-soap',
+    'baths': 'fa-bath',
+    'heaters': 'fa-fire',
+    'doors': 'fa-door-open',
+    'shower-cabins': 'fa-shower',
+    'shower-enclosures': 'fa-border-style',
+    'tiles': 'fa-th',
+    'flooring': 'fa-layer-group',
+    'furniture': 'fa-couch',
+    'towel-warmers': 'fa-temperature-high',
+    'radiators': 'fa-th-large',
+    'sanitary': 'fa-faucet',
+    'installation': 'fa-tools',
+    'drains': 'fa-grip-lines',
+    'mixers': 'fa-faucet',
+    'promotions': 'fa-tags'
 };
 
-// Генерация кнопок фильтров
-export const renderFilters = (categories, container) => {
-    const allCategories = ['Все', ...categories];
+// Генерация многоуровневых фильтров с выпадающими подкатегориями
+export const renderFilters = (categoriesData, products, container) => {
+    const counts = products.reduce((acc, item) => {
+        acc[item.category] = (acc[item.category] || 0) + 1;
+        return acc;
+    }, {});
+    const totalCount = products.length;
 
-    // В реальном проекте мы бы считали кол-во товаров, тут пока фейк или пусто
-    container.innerHTML = allCategories.map(cat => `
-        <li class="category-item ${cat === 'Все' ? 'active' : ''}" data-category="${cat}">
-            <span>${cat}</span>
-            <i class="fas fa-chevron-right" style="font-size: 0.7rem; opacity: 0.3;"></i>
-        </li>
-    `).join('');
+    container.innerHTML = categoriesData.map(cat => {
+        const hasSubcategories = cat.subcategories && cat.subcategories.length > 0;
+        const icon = categoryIcons[cat.id] || 'fa-cube';
+        const count = cat.id === 'all' ? totalCount : (counts[cat.name] || 0);
+        const isActive = cat.id === 'all' ? 'active' : '';
+        
+        let html = `
+        <li class="category-item ${isActive} ${hasSubcategories ? 'has-subcategories' : ''}" 
+            data-category-id="${cat.id}" 
+            data-category-name="${cat.name}">
+            <div class="category-main">
+                <span class="category-icon"><i class="fas ${icon}"></i></span>
+                <span class="category-label">${cat.name}</span>
+                <span class="category-count-pill">${count}</span>
+                ${hasSubcategories ? '<i class="fas fa-chevron-down category-chevron"></i>' : ''}
+            </div>
+        `;
+        
+        if (hasSubcategories) {
+            html += `<ul class="subcategory-list">`;
+            cat.subcategories.forEach(sub => {
+                const subCount = counts[sub.name] || 0;
+                html += `
+                    <li class="subcategory-item" 
+                        data-category-id="${sub.id}" 
+                        data-category-name="${sub.name}"
+                        data-parent="${sub.parent}">
+                        <span class="subcategory-label">${sub.name}</span>
+                        <span class="category-count-pill">${subCount}</span>
+                    </li>
+                `;
+            });
+            html += `</ul>`;
+        }
+        
+        html += `</li>`;
+        return html;
+    }).join('');
+    
+    // Добавляем обработчик для раскрытия/скрытия подкатегорий
+    setTimeout(() => {
+        container.querySelectorAll('.category-main').forEach(mainItem => {
+            mainItem.addEventListener('click', (e) => {
+                const parent = mainItem.parentElement;
+                if (parent.classList.contains('has-subcategories')) {
+                    parent.classList.toggle('expanded');
+                    e.stopPropagation();
+                }
+            });
+        });
+    }, 100);
 };
 
 // Переключение активного класса
-export const setActiveFilter = (category) => {
-    const items = document.querySelectorAll('.category-item');
+export const setActiveFilter = (categoryId) => {
+    const items = document.querySelectorAll('.category-item, .subcategory-item');
     items.forEach(item => {
-        if (item.dataset.category === category) {
+        if (item.dataset.categoryId === categoryId) {
             item.classList.add('active');
+            // Если это подкатегория, раскрываем родительскую категорию
+            if (item.classList.contains('subcategory-item')) {
+                const parentCategory = item.closest('.category-item');
+                if (parentCategory) {
+                    parentCategory.classList.add('expanded');
+                }
+            }
         } else {
             item.classList.remove('active');
         }

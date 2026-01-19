@@ -226,6 +226,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
+            if (!productData.img) {
+                setStatus('Добавь ссылку или прикрепи файл изображения', 'error');
+                return;
+            }
+
             if (id) {
                 await productService.update(id, productData);
                 setStatus('Товар обновлен', 'success');

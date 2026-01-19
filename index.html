@@ -37,9 +37,9 @@
             </button>
 
             <!-- LOGO (Typographic) -->
-            <div class="logo" onclick="router.goHome()">
-                Ванная комната <sup>1</sup>
-            </div>
+            <a href="index.html" class="logo logo-img" aria-label="Ванная комната">
+                <img src="uploads/1.png" alt="Ванная комната">
+            </a>
 
             <!-- ACTIONS -->
             <div class="header-actions">
@@ -58,79 +58,177 @@
         <!-- START HOME PAGE -->
         <div id="homePage" class="page-section active">
 
-            <!-- HERO SECTION: Editorial Style -->
-            <section class="hero-section">
-                <div class="container hero-container">
-                    <div class="hero-content">
-                        <span class="hero-label">Коллекция 2024</span>
-                        <h1 class="hero-title">
-                            Эстетика <br>
-                            <span class="text-accent">чистой формы</span>
-                        </h1>
-                        <p class="hero-desc">
-                            Премиальные аксессуары, превращающие ванную комнату в пространство для медитации и восстановления.
-                        </p>
-                        <div class="hero-actions">
-                            <button class="btn-primary" onclick="scrollToCatalog()">Перейти в каталог</button>
-                            <div class="hero-stat">
-                                <span class="stat-num">150+</span>
-                                <span class="stat-text">Уникальных<br>позиций</span>
-                            </div>
+        <!-- HERO MODERN (Redesigned) -->
+        <section class="hero-modern" id="heroSection">
+            <div class="hero-grid container">
+                
+                <!-- LEFT: Content -->
+                <div class="hero-content">
+                    <div class="hero-badge-wrapper fade-in-up" style="--d: 0.1s">
+                        <div class="hero-badge">
+                            <span class="status-dot"></span>
+                            Premium Collection 2026
                         </div>
                     </div>
-                    <div class="hero-visual">
-                        <div class="image-reveal-mask">
-                            <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Interior" class="hero-img">
+
+                    <h1 class="hero-title fade-in-up" style="--d: 0.2s">
+                        Эстетика <br>
+                        <span class="font-italic text-accent-gradient">Вашей Ванной</span>
+                    </h1>
+
+                    <p class="hero-desc fade-in-up" style="--d: 0.3s">
+                        Создаем атмосферу спокойствия и роскоши. Идеальный баланс формы и функции для вашего дома в Новосибирске.
+                    </p>
+
+                    <div class="hero-actions fade-in-up" style="--d: 0.4s">
+                        <a href="catalog.html" class="btn-primary btn-lg">
+                            Перейти в каталог
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                        <div class="trust-badge">
+                            <div class="avatars">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+                                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
+                            </div>
+                            <span>500+ отзывов</span>
+                        </div>
+                    </div>
+
+                    <div class="hero-stats fade-in-up" style="--d: 0.5s">
+                        <div class="stat-item">
+                            <span class="stat-num">100%</span>
+                            <span class="stat-label">Оригинал</span>
+                        </div>
+                        <div class="stat-sep"></div>
+                        <div class="stat-item">
+                            <span class="stat-num">15</span>
+                            <span class="stat-label">Лет опыта</span>
+                        </div>
+                        <div class="stat-sep"></div>
+                        <div class="stat-item">
+                            <span class="stat-num">24/7</span>
+                            <span class="stat-label">Поддержка</span>
                         </div>
                     </div>
                 </div>
-            </section>
 
-            <!-- CATALOG SECTION -->
-            <section class="catalog container" id="catalog">
-                <div class="catalog-header">
-                    <h2 class="section-title">Каталог</h2>
-                    <!-- Декоративная линия -->
-                    <div class="header-line"></div>
-                </div>
+                <!-- RIGHT: Visual -->
+                <div class="hero-visual fade-in-scale" style="--d: 0.4s">
+                    <div class="image-mask">
+                        <img src="uploads\main.png" 
+                             alt="Premium Bathroom Interior" 
+                             class="hero-main-img">
+                        <div class="image-overlay-gradient"></div>
+                    </div>
 
-                <div class="catalog-wrapper">
-                    <!-- SIDEBAR: Sticky & Clean -->
-                    <aside class="catalog-sidebar">
-                        <!-- Search -->
-                        <div class="sidebar-group">
-                            <div class="input-wrapper">
-                                <i class="fas fa-search input-icon"></i>
-                                <input type="text" id="searchInput" class="styled-input" placeholder="Поиск...">
-                            </div>
-                        </div>
-
-                        <!-- Categories -->
-                        <div class="sidebar-group">
-                            <span class="sidebar-label">Категории</span>
-                            <ul class="category-list" id="sidebarCategories">
-                                <!-- JS Render -->
-                            </ul>
-                        </div>
-
-                        <!-- Price Filter -->
-                        <div class="sidebar-group">
-                            <span class="sidebar-label">Стоимость</span>
-                            <div class="price-range">
-                                <input type="number" id="priceMin" class="styled-input" placeholder="0">
-                                <span class="range-sep">—</span>
-                                <input type="number" id="priceMax" class="styled-input" placeholder="Max">
-                            </div>
-                            <button class="btn-outline btn-full" id="applyFiltersBtn">Применить</button>
-                        </div>
-                    </aside>
-
-                    <!-- GRID -->
-                    <div class="catalog-content">
-                        <div class="products-grid" id="productsGrid">
-                            <!-- JS Render -->
+                    <!-- Floating Card 1 -->
+                    <div class="glass-card float-card-1">
+                        <div class="icon-box"><i class="fas fa-shipping-fast"></i></div>
+                        <div class="glass-content">
+                            <strong>Быстрая доставка</strong>
+                            <span>по Новосибирску</span>
                         </div>
                     </div>
+
+                    <!-- Floating Card 2 -->
+                    <div class="glass-card float-card-2">
+                        <div class="icon-box warning"><i class="fas fa-tag"></i></div>
+                        <div class="glass-content">
+                            <strong>Скидки до 40%</strong>
+                            <span>на коллекции 2025</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marquee Line -->
+            <div class="hero-marquee">
+                <div class="marquee-track">
+                    <span>Premium Quality • Fast Delivery • Eco Friendly • Italian Design • Warranty 5 Years • Premium Quality • Fast Delivery • Eco Friendly • Italian Design •</span>
+                    <span>Premium Quality • Fast Delivery • Eco Friendly • Italian Design • Warranty 5 Years • Premium Quality • Fast Delivery • Eco Friendly • Italian Design •</span>
+                </div>
+            </div>
+        </section>
+
+            <!-- CATEGORIES BENTO GRID -->
+            <section class="categories-section container" id="categoriesSection">
+                <div class="section-header">
+                    <span class="section-eyebrow">Выберите направление</span>
+                    <h2 class="section-title-lg">Наши категории</h2>
+                    <p class="section-desc">Добро пожаловать в дисконт-центр сантехники «Ванная комната». Качество по честным ценам.</p>
+                </div>
+
+                <div class="categories-bento">
+                    <!-- Row 1: 3 cards -->
+                    <a href="catalog.html?category=mixers" class="category-card" data-category="mixers">
+                        <img src="uploads/c0lof6hizmo0v2at1i7a86myo2hqjct4.png" alt="Смесители" class="category-bg">
+                        <div class="category-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-name">Смесители</span>
+                            <span class="category-count">120+ товаров</span>
+                        </div>
+                        <div class="category-icon"><i class="fas fa-faucet"></i></div>
+                    </a>
+
+                    <a href="catalog.html?category=shower-cabins" class="category-card card-featured" data-category="shower-cabins">
+                        <img src="uploads/orig.png" alt="Душевые кабины" class="category-bg">
+                        <div class="category-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-name">Душевые кабины</span>
+                            <span class="category-count">45+ товаров</span>
+                        </div>
+                        <div class="category-icon"><i class="fas fa-shower"></i></div>
+                    </a>
+
+                    <a href="catalog.html?category=sanitary" class="category-card" data-category="sanitary">
+                        <img src="uploads/5a0d18c2-78f8-11f0-b0be-74563c5eeaab_7e564bcb-78f8-11f0-b0be-74563c5eeaab.png" alt="Сантехника" class="category-bg">
+                        <div class="category-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-name">Сантехника</span>
+                            <span class="category-count">80+ товаров</span>
+                        </div>
+                        <div class="category-icon"><i class="fas fa-toilet"></i></div>
+                    </a>
+
+                    <!-- Row 2: 3 cards -->
+                    <a href="catalog.html?category=flooring" class="category-card" data-category="flooring">
+                        <img src="uploads/ih47nltdquprtd4gwy5tjo3j3y4boreq.png" alt="Ламинат и ПВХ" class="category-bg">
+                        <div class="category-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-name">Ламинат и ПВХ</span>
+                            <span class="category-count">40+ товаров</span>
+                        </div>
+                        <div class="category-icon"><i class="fas fa-layer-group"></i></div>
+                    </a>
+
+                    <a href="catalog.html?category=baths" class="category-card card-wide" data-category="baths">
+                        <img src="uploads/gUbYLtA6.jpg" alt="Ванны" class="category-bg">
+                        <div class="category-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-name">Ванны</span>
+                            <span class="category-count">35+ товаров</span>
+                        </div>
+                        <div class="category-icon"><i class="fas fa-bath"></i></div>
+                    </a>
+
+                    <a href="catalog.html?category=heaters" class="category-card" data-category="heaters">
+                        <img src="https://images.unsplash.com/photo-1564540574859-0dfb63985953?auto=format&fit=crop&w=800&q=80" alt="Водонагреватели" class="category-bg">
+                        <div class="category-overlay"></div>
+                        <div class="category-content">
+                            <span class="category-name">Водонагреватели</span>
+                            <span class="category-count">25+ товаров</span>
+                        </div>
+                        <div class="category-icon"><i class="fas fa-fire-alt"></i></div>
+                    </a>
+                </div>
+
+                <!-- View All Button -->
+                <div class="categories-cta">
+                    <a href="catalog.html" class="btn-outline-lg">
+                        Смотреть все товары
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </section>
 
@@ -159,7 +257,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <div class="logo" style="margin-bottom: 15px;">Ванная<span>комната</span></div>
+                    <div class="logo" style="margin-bottom: 15px;">Ванная Комната</div>
                     <p style="color: #999; margin-bottom: 10px;">Премиальные аксессуары для создания идеальной ванной комнаты</p>
                     <p style="color: #999; font-size: 0.9em;">Качество и комфорт в каждой детали</p>
                 </div>
@@ -185,7 +283,7 @@
             </div>
 
             <div class="footer-bottom">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid #333;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px;">
                     <p style="color: #777; font-size: 0.85em;">&copy; 2026 Ванная комната. Все права защищены.</p>
                     <p style="color: #777; font-size: 0.85em;">Сайт разработан с ❤️</p>
                 </div>

@@ -35,8 +35,7 @@
         .admin-subtitle { color: var(--admin-muted); font-size: 0.9rem; }
         .admin-actions { display: flex; gap: 10px; align-items: center; }
 
-        .admin-grid { display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: start; }
-        @media (max-width: 1024px) { .admin-grid { grid-template-columns: 1fr; } }
+        .admin-grid { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
 
         .card {
             background: var(--admin-card);
@@ -99,6 +98,15 @@
             padding: 24px; box-shadow: var(--admin-shadow); border: 1px solid var(--admin-border);
         }
         .admin-auth-card h3 { margin-bottom: 8px; }
+
+        .tab-buttons { display: flex; gap: 10px; border-bottom: 1px solid var(--admin-border); margin-bottom: 12px; }
+        .tab-btn {
+            padding: 8px 14px; border: none; background: none; cursor: pointer;
+            font-weight: 600; color: var(--admin-muted);
+        }
+        .tab-btn.active { color: var(--color-primary); border-bottom: 2px solid var(--color-accent); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
 <body>
@@ -109,112 +117,12 @@
                 <div class="admin-subtitle">Обновления появляются сразу после сохранения</div>
             </div>
             <div class="admin-actions">
+                <button class="btn-ghost" id="openAddModal">Добавить товары</button>
                 <a href="index.html" class="btn-secondary">На сайт</a>
             </div>
         </div>
 
         <div class="admin-grid">
-        <!-- Форма добавления/редактирования -->
-        <aside>
-            <div class="card sticky">
-                <h3 class="section-title" id="formTitle">Новый товар</h3>
-                <form id="productForm">
-                    <input type="hidden" id="prodId">
-
-                    <div class="form-group">
-                        <label>Название</label>
-                        <input type="text" id="prodName" class="form-control" required placeholder="Напр: Мыльница">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Категория</label>
-                        <input type="text" id="prodCategory" class="form-control" list="catList" required>
-                        <datalist id="catList"></datalist>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Цена (₽)</label>
-                        <input type="number" id="prodPrice" class="form-control" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Старая цена (₽)</label>
-                        <input type="number" id="prodOldPrice" class="form-control" placeholder="Опционально">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Бейдж (Хит/Новинка/Скидка)</label>
-                        <input type="text" id="prodBadge" class="form-control" placeholder="Опционально">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Описание</label>
-                        <textarea id="prodDesc" class="form-control" rows="3" placeholder="Короткое описание"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Рейтинг (0-5)</label>
-                        <input type="number" step="0.1" id="prodRating" class="form-control" placeholder="Опционально">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Отзывы (кол-во)</label>
-                        <input type="number" id="prodReviews" class="form-control" placeholder="Опционально">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Остаток</label>
-                        <input type="number" id="prodStock" class="form-control" placeholder="Опционально">
-                    </div>
-
-                    <div class="form-group">
-                        <label>URL Картинки</label>
-                        <input type="url" id="prodImg" class="form-control" required placeholder="https://...">
-                    </div>
-
-                    <button type="submit" class="btn-primary" id="submitBtn">Добавить товар</button>
-                    <button type="button" class="btn-danger" id="cancelBtn" style="display: none;">Отмена</button>
-                </form>
-
-                <hr class="divider">
-
-                <h4 class="section-title">Экспорт данных</h4>
-                <p class="muted">Экспорт текущего каталога (JSON).</p>
-                <textarea id="jsonOutput" class="form-control" rows="5" readonly></textarea>
-
-                <hr class="divider">
-
-                <h4 class="section-title">Импорт JSON (Bulk)</h4>
-                <p class="muted">Вставь массив JSON и нажми «Импортировать».</p>
-                <textarea id="jsonImport" class="form-control" rows="6" placeholder='[{"name":"...","category":"...","price":1000,"img":"..."}]'></textarea>
-                <button type="button" class="btn-primary" id="importBtn" style="margin-top:10px;">Импортировать</button>
-
-                <hr class="divider">
-
-                <h4 class="section-title">Импорт CSV</h4>
-                <div class="import-grid">
-                    <input type="file" id="csvFile" class="form-control" accept=".csv">
-                    <select id="csvDelimiter" class="form-control">
-                        <option value=";">Разделитель: ;</option>
-                        <option value=",">Разделитель: ,</option>
-                        <option value="	">Разделитель: таб</option>
-                    </select>
-                    <select id="csvEncoding" class="form-control">
-                        <option value="utf-8">Кодировка: UTF-8</option>
-                        <option value="windows-1251">Кодировка: Windows-1251</option>
-                    </select>
-                    <div class="muted">Колонки: name, category, price, img, oldPrice, badge, desc, rating, reviews, stock</div>
-                    <button type="button" class="btn-ghost" id="previewCsvBtn">Показать превью</button>
-                    <textarea id="csvPreview" class="form-control" rows="5" readonly placeholder="Превью первых строк..."></textarea>
-                    <button type="button" class="btn-ghost" id="downloadCsvTemplate">Скачать CSV шаблон</button>
-                    <button type="button" class="btn-primary" id="importCsvBtn">Импортировать CSV</button>
-                    <div id="importStatus" class="status-line"></div>
-                    <div id="importErrors" class="status-line error"></div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Таблица товаров -->
         <main class="table-card">
             <div class="table-header">
                 <div class="section-title">Каталог</div>
@@ -256,6 +164,110 @@
                 <div id="adminAuthError" class="status-line error"></div>
                 <button type="submit" class="btn-primary" style="margin-top: 10px;">Войти</button>
             </form>
+        </div>
+    </div>
+
+    <div class="admin-auth" id="addModal" style="display:none;">
+        <div class="admin-auth-card" style="width: 720px;">
+            <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:10px;">
+                <h3>Добавление товаров</h3>
+                <button class="action-btn" id="closeAddModal">&times;</button>
+            </div>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="single">Единичное добавление</button>
+                <button class="tab-btn" data-tab="bulk">Bulk</button>
+            </div>
+
+            <div class="tab-content active" data-tab="single">
+                <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                    <span class="muted">Режим:</span>
+                    <button class="btn-ghost" id="singleModeManual">Ручной</button>
+                    <button class="btn-ghost" id="singleModeJson">JSON</button>
+                </div>
+
+                <form id="singleForm">
+                    <input type="hidden" id="prodId">
+                    <div id="singleManualBlock">
+                        <div class="form-group">
+                            <label>Название</label>
+                            <input type="text" id="prodName" class="form-control" required placeholder="Напр: Мыльница">
+                        </div>
+                        <div class="form-group">
+                            <label>Категория</label>
+                            <input type="text" id="prodCategory" class="form-control" list="catList" required>
+                            <datalist id="catList"></datalist>
+                        </div>
+                        <div class="form-group">
+                            <label>Цена (₽)</label>
+                            <input type="number" id="prodPrice" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Старая цена (₽)</label>
+                            <input type="number" id="prodOldPrice" class="form-control" placeholder="Опционально">
+                        </div>
+                        <div class="form-group">
+                            <label>Бейдж (Хит/Новинка/Скидка)</label>
+                            <input type="text" id="prodBadge" class="form-control" placeholder="Опционально">
+                        </div>
+                        <div class="form-group">
+                            <label>Описание</label>
+                            <textarea id="prodDesc" class="form-control" rows="3" placeholder="Короткое описание"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Рейтинг (0-5)</label>
+                            <input type="number" step="0.1" id="prodRating" class="form-control" placeholder="Опционально">
+                        </div>
+                        <div class="form-group">
+                            <label>Отзывы (кол-во)</label>
+                            <input type="number" id="prodReviews" class="form-control" placeholder="Опционально">
+                        </div>
+                        <div class="form-group">
+                            <label>Остаток</label>
+                            <input type="number" id="prodStock" class="form-control" placeholder="Опционально">
+                        </div>
+                        <div class="form-group">
+                            <label>URL Картинки</label>
+                            <input type="url" id="prodImg" class="form-control" required placeholder="https://...">
+                        </div>
+                        <div class="form-group">
+                            <label>Загрузка картинки</label>
+                            <input type="file" id="prodImgFile" class="form-control" accept="image/*">
+                            <div class="muted">Файл загрузится на сервер, URL подставится автоматически.</div>
+                        </div>
+                    </div>
+
+                    <div id="singleJsonBlock" style="display:none;">
+                        <div class="form-group">
+                            <label>JSON товара</label>
+                            <textarea id="singleJsonInput" class="form-control" rows="6" placeholder='{"name":"...","category":"...","price":1000,"img":"..."}'></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Загрузка картинки</label>
+                            <input type="file" id="singleJsonImgFile" class="form-control" accept="image/*">
+                            <div class="muted">Если прикрепить файл — поле img будет заменено.</div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="submitBtn">Добавить товар</button>
+                </form>
+            </div>
+
+            <div class="tab-content" data-tab="bulk">
+                <div class="form-group">
+                    <label>JSON массив товаров</label>
+                    <textarea id="bulkJsonInput" class="form-control" rows="8" placeholder='[{"name":"...","category":"...","price":1000,"img":"file1.jpg","imageFile":"file1.jpg"}]'></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Файлы изображений</label>
+                    <input type="file" id="bulkImages" class="form-control" accept="image/*" multiple>
+                    <div class="muted">Укажи в JSON поле imageFile или img с именем файла для привязки.</div>
+                </div>
+                <button type="button" class="btn-primary" id="bulkImportBtn">Импортировать bulk</button>
+            </div>
+
+            <div id="importStatus" class="status-line"></div>
+            <div id="importErrors" class="status-line error"></div>
         </div>
     </div>
 </body>

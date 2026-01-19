@@ -10,7 +10,7 @@
         "reviews": 124,
         "stock": 12,
         "desc": "Натуральный камень, приятная фактура и аккуратный дозатор.",
-        "img": "https://images.unsplash.com/photo-1585232004423-244e0e6904e3?auto=format&fit=crop&w=800&q=80"
+        "img": "https:\/\/images.unsplash.com\/photo-1585232004423-244e0e6904e3?auto=format&fit=crop&w=800&q=80"
     },
     {
         "id": 2,
@@ -22,7 +22,7 @@
         "reviews": 58,
         "stock": 7,
         "desc": "Экологичный бамбук, устойчив к влаге и легко моется.",
-        "img": "https://images.unsplash.com/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=800&q=80"
+        "img": "https:\/\/images.unsplash.com\/photo-1620626011761-996317b8d101?auto=format&fit=crop&w=800&q=80"
     },
     {
         "id": 3,
@@ -35,7 +35,7 @@
         "reviews": 203,
         "stock": 0,
         "desc": "Плотный хлопок, мягкость после каждой стирки.",
-        "img": "https://images.unsplash.com/photo-1616627547584-bf28cee262db?auto=format&fit=crop&w=800&q=80"
+        "img": "https:\/\/images.unsplash.com\/photo-1616627547584-bf28cee262db?auto=format&fit=crop&w=800&q=80"
     },
     {
         "id": 4,
@@ -46,7 +46,7 @@
         "reviews": 41,
         "stock": 24,
         "desc": "Теплый древесный аромат, чистое горение без копоти.",
-        "img": "https://images.unsplash.com/photo-1602825485432-69933029f821?auto=format&fit=crop&w=800&q=80"
+        "img": "https:\/\/images.unsplash.com\/photo-1602825485432-69933029f821?auto=format&fit=crop&w=800&q=80"
     },
     {
         "id": 5,
@@ -58,7 +58,7 @@
         "reviews": 87,
         "stock": 4,
         "desc": "Мягкая подсветка и антизапотевание для идеального отражения.",
-        "img": "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=800&q=80"
+        "img": "https:\/\/images.unsplash.com\/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=800&q=80"
     },
     {
         "id": 6,
@@ -69,7 +69,7 @@
         "reviews": 32,
         "stock": 15,
         "desc": "Металлический сплав с защитой от коррозии.",
-        "img": "https://images.unsplash.com/photo-1616627561950-9f840507458b?auto=format&fit=crop&w=800&q=80"
+        "img": "https:\/\/images.unsplash.com\/photo-1616627561950-9f840507458b?auto=format&fit=crop&w=800&q=80"
     },
     {
         "id": 7,
@@ -81,6 +81,30 @@
         "reviews": 18,
         "stock": 2,
         "desc": "Закаленное стекло, плавная фурнитура и современный дизайн.",
-        "img": "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80"
+        "img": "https:\/\/images.unsplash.com\/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 8,
+        "name": "Унитаз подвесной Calypso Black",
+        "category": "Сантехника",
+        "price": 18000,
+        "badge": "Новинка",
+        "rating": 5,
+        "reviews": 3,
+        "stock": 8,
+        "desc": "Черный матовый, ультратихий смыв «Торнадо», сиденье дюропласт с микролифтом.",
+        "img": "https:\/\/images.unsplash.com\/photo-1564540574859-0dfb63985953?auto=format&fit=crop&w=800&q=80"
+    },
+    {
+        "id": 9,
+        "name": "Унитаз подвесной Tornado Slim White",
+        "category": "Сантехника",
+        "price": 9932,
+        "badge": "Суперцена",
+        "rating": 4.7,
+        "reviews": 14,
+        "stock": 20,
+        "desc": "Белый фарфор, ультратихий смыв «Торнадо», ультратонкое сиденье с микролифтом.",
+        "img": "https:\/\/images.unsplash.com\/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=800&q=80"
     }
 ]

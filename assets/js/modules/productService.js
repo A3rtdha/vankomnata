@@ -69,7 +69,16 @@ class ProductService {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(items)
         });
-        const data = await res.json();
+        const text = await res.text();
+        if (!text.trim()) {
+            throw new Error('Пустой ответ от сервера');
+        }
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (err) {
+            throw new Error('Некорректный ответ сервера');
+        }
         if (Array.isArray(data)) {
             this.products = data;
         }

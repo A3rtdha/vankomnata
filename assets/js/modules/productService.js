@@ -2,6 +2,9 @@ import { products as defaultProducts } from '../data/products.js';
 
 const API_URL = '/api/products.php';
 
+const apiFetch = (url, options = {}) =>
+    fetch(url, { credentials: 'same-origin', ...options });
+
 class ProductService {
     constructor() {
         this.products = [];
@@ -32,12 +35,15 @@ class ProductService {
     }
 
     async add(product) {
-        const res = await fetch(API_URL, {
+        const res = await apiFetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(product)
         });
         const created = await res.json();
+        if (!res.ok) {
+            throw new Error(created.error || 'Не удалось добавить товар');
+        }
         if (created && created.id) {
             this.products.push(created);
         }
@@ -45,12 +51,15 @@ class ProductService {
     }
 
     async update(id, updatedFields) {
-        const res = await fetch(`${API_URL}?id=${encodeURIComponent(id)}`, {
+        const res = await apiFetch(`${API_URL}?id=${encodeURIComponent(id)}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedFields)
         });
         const updated = await res.json();
+        if (!res.ok) {
+            throw new Error(updated.error || 'Не удалось обновить товар');
+        }
         const index = this.products.findIndex(p => p.id == id);
         if (index !== -1) {
             this.products[index] = updated;
@@ -59,12 +68,16 @@ class ProductService {
     }
 
     async delete(id) {
-        await fetch(`${API_URL}?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+        const res = await apiFetch(`${API_URL}?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+        if (!res.ok) {
+            const data = await res.json().catch(() => ({}));
+            throw new Error(data.error || 'Не удалось удалить товар');
+        }
         this.products = this.products.filter(p => p.id != id);
     }
 
     async importBulk(items) {
-        const res = await fetch(`${API_URL}?action=import`, {
+        const res = await apiFetch(`${API_URL}?action=import`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(items)
@@ -78,6 +91,9 @@ class ProductService {
             data = JSON.parse(text);
         } catch (err) {
             throw new Error('Некорректный ответ сервера');
+        }
+        if (!res.ok) {
+            throw new Error(data.error || 'Не удалось импортировать товары');
         }
         if (Array.isArray(data)) {
             this.products = data;

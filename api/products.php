@@ -11,6 +11,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 
+// ЗАЩИТА: методы изменения данных требуют авторизацию
+if ($method === 'POST' || $method === 'PUT' || $method === 'DELETE') {
+    require_once __DIR__ . '/auth_check.php';
+}
+
 function readProducts($path) {
     $raw = file_get_contents($path);
     $data = json_decode($raw, true);

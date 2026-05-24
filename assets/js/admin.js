@@ -3,9 +3,9 @@ import { productService } from './modules/productService.js';
 // Делаем сервис доступным глобально для кнопок onclick в HTML
 window.productService = productService;
 
+const AUTH_URL = '/api/auth.php';
+
 document.addEventListener('DOMContentLoaded', async () => {
-    const ADMIN_LOGIN = 'admin';
-    const ADMIN_PASSWORD = 'admin123';
     const tableBody = document.getElementById('adminTableBody');
     const catList = document.getElementById('catList');
     const productsCount = document.getElementById('productsCount');
@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const adminLogin = document.getElementById('adminLogin');
     const adminPassword = document.getElementById('adminPassword');
     const adminAuthError = document.getElementById('adminAuthError');
+    const adminLogoutBtn = document.getElementById('adminLogoutBtn');
 
     const openAddModalBtn = document.getElementById('openAddModal');
     const addModal = document.getElementById('addModal');
@@ -108,6 +109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         formData.append('file', file);
         const res = await fetch('/api/upload.php', {
             method: 'POST',
+            credentials: 'same-origin',
             body: formData
         });
         const text = await res.text();
@@ -306,26 +308,83 @@ document.addEventListener('DOMContentLoaded', async () => {
         await renderTable();
     });
 
-    const checkAuth = () => {
-        const isAuthed = sessionStorage.getItem('admin_authed') === 'true';
+    const setAdminUiAuthed = (isAuthed) => {
         adminAuthOverlay.style.display = isAuthed ? 'none' : 'flex';
+        if (adminLogoutBtn) {
+            adminLogoutBtn.style.display = isAuthed ? 'inline-block' : 'none';
+        }
+        if (openAddModalBtn) {
+            openAddModalBtn.disabled = !isAuthed;
+        }
     };
 
-    adminAuthForm.addEventListener('submit', (e) => {
+    const checkAuth = async () => {
+        try {
+            const res = await fetch(AUTH_URL, { credentials: 'same-origin' });
+            const data = await res.json();
+
+            if (data.authenticated) {
+                setAdminUiAuthed(true);
+                await renderTable();
+            } else {
+                setAdminUiAuthed(false);
+            }
+        } catch (err) {
+            console.error('Ошибка проверки авторизации:', err);
+            setAdminUiAuthed(false);
+        }
+    };
+
+    adminAuthForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (adminLogin.value === ADMIN_LOGIN && adminPassword.value === ADMIN_PASSWORD) {
-            sessionStorage.setItem('admin_authed', 'true');
-            adminAuthError.textContent = '';
-            adminAuthOverlay.style.display = 'none';
-            adminLogin.value = '';
-            adminPassword.value = '';
-        } else {
-            adminAuthError.textContent = 'Неверный пароль';
+        adminAuthError.textContent = '';
+
+        const username = adminLogin.value.trim();
+        const password = adminPassword.value;
+
+        try {
+            const res = await fetch(AUTH_URL, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.success) {
+                adminLogin.value = '';
+                adminPassword.value = '';
+                setAdminUiAuthed(true);
+                await renderTable();
+            } else {
+                adminAuthError.textContent = data.error || 'Ошибка входа';
+            }
+        } catch (err) {
+            console.error('Ошибка запроса авторизации:', err);
+            adminAuthError.textContent = 'Не удалось связаться с сервером';
         }
     });
 
-    checkAuth();
+    const logout = async () => {
+        try {
+            const res = await fetch(`${AUTH_URL}?action=logout`, {
+                method: 'POST',
+                credentials: 'same-origin'
+            });
+            if (res.ok) {
+                window.location.reload();
+            }
+        } catch (err) {
+            console.error('Ошибка при выходе:', err);
+        }
+    };
+
+    if (adminLogoutBtn) {
+        adminLogoutBtn.addEventListener('click', logout);
+    }
+
     setSingleMode('manual');
     setTab('single');
-    await renderTable();
+    await checkAuth();
 });

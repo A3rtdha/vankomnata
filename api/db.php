@@ -1,25 +1,39 @@
 <?php
-$host = 'db';
 $db   = 'vancom_db';
 $user = 'vancom_user';
 $pass = 'vancom_pass';
 $charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$hosts = array_values(array_unique(array_filter([
+    getenv('MYSQL_HOST') ?: null,
+    'db',
+    '127.0.0.1',
+])));
+
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES   => false,
 ];
 
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
+$pdo = null;
+$lastError = null;
+
+foreach ($hosts as $host) {
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$db;charset=$charset", $user, $pass, $options);
+        break;
+    } catch (\PDOException $e) {
+        $lastError = $e;
+    }
+}
+
+if (!$pdo) {
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
     echo json_encode([
-        'error' => 'Не удалось подключиться к MySQL. Запустите MySQL локально или используйте docker compose up.',
-        'hint'  => 'Локально: scripts\\start-local.ps1 после установки MySQL (см. README).'
+        'error' => 'Не удалось подключиться к MySQL.',
+        'hint'  => 'Запустите: docker compose up --build. Сайт: http://localhost:8080. Если ошибка остаётся — сбросьте том БД: docker compose down -v && docker compose up --build.'
     ], JSON_UNESCAPED_UNICODE);
     exit;
 }
@@ -40,6 +54,18 @@ try {
         `desc` TEXT NULL,
         `img` VARCHAR(512) NOT NULL,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS `reviews` (
+        `id` INT AUTO_INCREMENT PRIMARY KEY,
+        `product_id` INT NOT NULL,
+        `author` VARCHAR(100) NOT NULL,
+        `rating` INT NOT NULL,
+        `text` TEXT NOT NULL,
+        `ip_address` VARCHAR(45) NOT NULL,
+        `is_approved` TINYINT DEFAULT 0,
+        `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
 
     // Если база пуста — проверяем, есть ли старый products.json, и переносим данные в MySQL

@@ -9,39 +9,33 @@
     <meta property="og:title" content="Ванная комната | Премиальные аксессуары для ванной">
     <meta property="og:description" content="Премиальные аксессуары для создания идеальной ванной комнаты. Доставка по Новосибирску и России.">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1350&q=80">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1920&q=80">
     <meta name="twitter:card" content="summary_large_image">
     <title>Ванная комната | Премиальные аксессуары для ванной</title>
 
-    <!-- Typography: Cormorant (Serif) & Manrope (Sans) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <!-- CSS Modules -->
     <link rel="stylesheet" href="assets/css/variables.css">
     <link rel="stylesheet" href="assets/css/app.css">
 
-    <!-- JS Module Entry Point -->
     <script type="module" src="assets/js/main.js" defer></script>
 </head>
-<body>
+<body class="page-home">
 
     <header class="site-header">
         <div class="header-container container">
-            <!-- GEO (Minimal) -->
             <button class="geo-trigger" id="geoBtn">
-                <span class="geo-dot"></span> <!-- Индикатор вместо иконки -->
+                <span class="geo-dot"></span>
                 <span id="currentCity" class="geo-text">Новосибирск</span>
             </button>
 
-            <!-- LOGO (Typographic) -->
             <div class="logo" onclick="router.goHome()">
                 Ванная комната <sup>1</sup>
             </div>
 
-            <!-- ACTIONS -->
             <div class="header-actions">
                 <button class="icon-btn cart-trigger-btn" id="openCartBtn" aria-label="Корзина">
                     <span class="btn-label">Корзина</span>
@@ -52,49 +46,64 @@
     </header>
 
     <main>
-        <!-- START HOME PAGE -->
         <div id="homePage" class="page-section active">
 
-            <!-- HERO SECTION: Editorial Style -->
-            <section class="hero-section">
-                <div class="container hero-container">
-                    <div class="hero-content">
-                        <span class="hero-label">Коллекция 2024</span>
-                        <h1 class="hero-title">
-                            Эстетика <br>
-                            <span class="text-accent">чистой формы</span>
-                        </h1>
-                        <p class="hero-desc">
-                            Премиальные аксессуары, превращающие ванную комнату в пространство для медитации и восстановления.
-                        </p>
-                        <div class="hero-actions">
-                            <button class="btn-primary" onclick="scrollToCatalog()">Перейти в каталог</button>
-                            <div class="hero-stat">
-                                <span class="stat-num">150+</span>
-                                <span class="stat-text">Уникальных<br>позиций</span>
+            <section class="hero-section hero-section--splash" aria-label="Главный экран">
+                <div class="hero-splash-media" aria-hidden="true">
+                    <img
+                        src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80"
+                        alt=""
+                        class="hero-splash-img"
+                        width="1920"
+                        height="1280"
+                        fetchpriority="high"
+                    >
+                    <div class="hero-splash-overlay"></div>
+                </div>
+                <div class="hero-splash-content container">
+                    <p class="hero-eyebrow">Коллекция 2024 · Новосибирск</p>
+                    <h1 class="hero-title">
+                        Ванная<br>
+                        <span class="hero-title-accent">Комната</span>
+                    </h1>
+                    <p class="hero-lead">
+                        Дисконт-центр сантехники премиального уровня в Новосибирске. Эстетика чистой формы и комфорта.
+                    </p>
+                    <div class="hero-cta-row">
+                        <button type="button" class="btn-hero-shop" onclick="scrollToCatalog()">В магазин</button>
+                        <div class="hero-stat-inline">
+                            <span class="hero-stat-divider" aria-hidden="true"></span>
+                            <div class="hero-stat-copy">
+                                <span class="hero-stat-value">150+</span>
+                                <span class="hero-stat-label">уникальных позиций</span>
                             </div>
                         </div>
                     </div>
-                    <div class="hero-visual">
-                        <div class="image-reveal-mask">
-                            <img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Interior" class="hero-img">
-                        </div>
-                    </div>
+                    <p class="hero-splash-note">
+                        <button type="button" class="btn-hero-link" onclick="router.navigate('delivery'); return false;">Доставка и оплата</button>
+                    </p>
                 </div>
+                <a href="#catalog" class="hero-scroll-hint" onclick="scrollToCatalog(); return false;" aria-label="Перейти к каталогу">
+                    <span class="hero-scroll-label">Листайте</span>
+                    <span class="hero-scroll-line" aria-hidden="true"></span>
+                </a>
             </section>
 
-            <!-- CATALOG SECTION -->
             <section class="catalog container" id="catalog">
                 <div class="catalog-header">
                     <h2 class="section-title">Каталог</h2>
-                    <!-- Декоративная линия -->
                     <div class="header-line"></div>
                 </div>
 
                 <div class="catalog-wrapper">
-                    <!-- SIDEBAR: Sticky & Clean -->
-                    <aside class="catalog-sidebar">
-                        <!-- Search -->
+                    <aside class="catalog-sidebar" id="catalogSidebar" aria-label="Фильтры каталога">
+                        <div class="filters-drawer-header">
+                            <h3 class="filters-drawer-title">Фильтры</h3>
+                            <button type="button" class="filters-drawer-close" id="closeFiltersBtn" aria-label="Закрыть фильтры">
+                                <i class="fas fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+
                         <div class="sidebar-group">
                             <div class="input-wrapper">
                                 <i class="fas fa-search input-icon"></i>
@@ -102,15 +111,11 @@
                             </div>
                         </div>
 
-                        <!-- Categories -->
                         <div class="sidebar-group">
                             <span class="sidebar-label">Категории</span>
-                            <ul class="category-list" id="sidebarCategories">
-                                <!-- JS Render -->
-                            </ul>
+                            <ul class="category-list" id="sidebarCategories"></ul>
                         </div>
 
-                        <!-- Price Filter -->
                         <div class="sidebar-group">
                             <span class="sidebar-label">Стоимость</span>
                             <div class="price-range">
@@ -122,31 +127,29 @@
                         </div>
                     </aside>
 
-                    <!-- GRID -->
                     <div class="catalog-content">
-                        <div class="products-grid" id="productsGrid">
-                            <!-- JS Render -->
+                        <div class="catalog-mobile-toolbar" id="catalogMobileToolbar">
+                            <div class="catalog-chips-track" id="categoryChips" role="tablist" aria-label="Категории"></div>
+                            <button type="button" class="catalog-filters-btn" id="openFiltersBtn" aria-controls="catalogSidebar" aria-expanded="false">
+                                <i class="fas fa-sliders-h" aria-hidden="true"></i>
+                                <span>Фильтры</span>
+                            </button>
                         </div>
+                        <div class="products-grid" id="productsGrid"></div>
                     </div>
                 </div>
             </section>
 
         </div>
-        <!-- END HOME PAGE -->
 
-        <!-- INFO PAGE CONTAINER (Скрыт по умолчанию) -->
         <div id="infoPage" class="page-section" style="display: none;">
-            <div class="container" style="padding: 120px 20px 60px;">
-                <!-- Кнопка назад -->
-                <button class="btn-small btn-outline-white" onclick="router.goHome()" style="color:var(--text-primary); border-color:#ddd; margin-bottom: 30px;">
+            <div class="container info-page-container">
+                <button class="btn-small btn-outline-white info-back-btn" onclick="router.goHome()">
                     <i class="fas fa-arrow-left"></i> Назад в каталог
                 </button>
 
-                <!-- Сюда JS будет вставлять текст -->
-                <h1 id="infoTitle" style="margin-bottom: 30px;">Заголовок</h1>
-                <div id="infoContent" style="max-width: 800px; line-height: 1.8;">
-                    Контент...
-                </div>
+                <h1 id="infoTitle">Заголовок</h1>
+                <div id="infoContent">Контент...</div>
             </div>
         </div>
 
@@ -155,53 +158,49 @@
     <footer class="site-footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
-                    <div class="logo" style="margin-bottom: 15px;">Ванная<span>комната</span></div>
-                    <p style="color: #999; margin-bottom: 10px;">Премиальные аксессуары для создания идеальной ванной комнаты</p>
-                    <p style="color: #999; font-size: 0.9em;">Качество и комфорт в каждой детали</p>
+                <div class="footer-section brand-section">
+                    <div class="logo">Ванная комната <sup>1</sup></div>
+                    <p class="footer-desc">Премиальные аксессуары для создания гармонии и эстетики в вашей ванной комнате.</p>
                 </div>
 
                 <div class="footer-section">
-                    <h4 style="color: #fff; margin-bottom: 15px; font-weight: 600;">Информация</h4>
+                    <h4>Информация</h4>
                     <ul class="footer-links">
-                        <li><a href="#" onclick="router.navigate('about'); return false;" style="color: #ccc; text-decoration: none;">О компании</a></li>
-                        <li><a href="#" onclick="router.navigate('delivery'); return false;" style="color: #ccc; text-decoration: none;">Доставка и оплата</a></li>
-                        <li><a href="#" onclick="router.navigate('warranty'); return false;" style="color: #ccc; text-decoration: none;">Гарантия</a></li>
-                        <li><a href="#" onclick="router.navigate('return'); return false;" style="color: #ccc; text-decoration: none;">Возврат</a></li>
+                        <li><a href="#" onclick="router.navigate('about'); return false;">О компании</a></li>
+                        <li><a href="#" onclick="router.navigate('delivery'); return false;">Доставка и оплата</a></li>
+                        <li><a href="#" onclick="router.navigate('warranty'); return false;">Гарантия</a></li>
+                        <li><a href="#" onclick="router.navigate('return'); return false;">Возврат</a></li>
                     </ul>
                 </div>
 
                 <div class="footer-section">
-                    <h4 style="color: #fff; margin-bottom: 15px; font-weight: 600;">Контакты</h4>
-                    <div style="color: #ccc; font-size: 0.9em;">
-                        <p style="margin-bottom: 5px;"><i class="fas fa-phone" style="margin-right: 8px;"></i>+7 (383) 299-06-67</p>
-                        <p style="margin-bottom: 5px;"><i class="fas fa-envelope" style="margin-right: 8px;"></i>van-komnata@mail.ru</p>
-                        <p><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>Новосибирск, Россия</p>
+                    <h4>Контакты</h4>
+                    <div class="footer-contacts">
+                        <p><i class="fas fa-phone"></i> +7 (383) 299-06-67</p>
+                        <p><i class="fas fa-envelope"></i> van-komnata@mail.ru</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Новосибирск, Россия</p>
                     </div>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid #333;">
-                    <p style="color: #777; font-size: 0.85em;">&copy; 2026 Ванная комната. Все права защищены.</p>
-                    <p style="color: #777; font-size: 0.85em;">Сайт разработан с ❤️</p>
-                </div>
+                <p>&copy; 2026 Ванная комната. Все права защищены.</p>
+                <p>Сайт разработан с ❤️</p>
             </div>
         </div>
     </footer>
 
     <div class="toast" id="toast" role="alert">Товар добавлен в корзину!</div>
 
-    <!-- CART SIDEBAR -->
+    <div class="filters-overlay" id="filtersOverlay" aria-hidden="true"></div>
+
     <div class="cart-overlay" id="cartOverlay"></div>
     <aside class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
             <h3>Корзина</h3>
             <button class="close-cart" id="closeCart">&times;</button>
         </div>
-        <div class="cart-body" id="cartItemsContainer">
-            <!-- Товары будут здесь -->
-        </div>
+        <div class="cart-body" id="cartItemsContainer"></div>
         <div class="cart-footer">
             <div class="cart-total">
                 <span>Итого:</span>
@@ -211,13 +210,12 @@
         </div>
     </aside>
 
-    <!-- MODAL: CITY SELECTION -->
     <div class="modal-overlay" id="cityModal">
-        <div class="modal-window" style="max-width: 400px;">
+        <div class="modal-window city-modal-window">
             <button class="modal-close" onclick="toggleModal('cityModal', false)">&times;</button>
 
             <h3 class="modal-title">Выберите город</h3>
-            <p style="text-align: center; color: #666; margin-bottom: 20px; font-size: 0.9rem;">
+            <p class="modal-subtitle">
                 В данный момент доставка осуществляется только по Новосибирску и области.
             </p>
 
@@ -226,8 +224,7 @@
                     <input type="text" id="cityInput" class="input-field" placeholder="Введите название города" autocomplete="off">
                 </div>
 
-                <!-- Сообщение об ошибке (скрыто по умолчанию) -->
-                <div id="cityError" style="display: none; background: #ffebee; color: #c62828; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px; text-align: center;">
+                <div id="cityError" class="city-error-box">
                     <i class="fas fa-exclamation-circle"></i> К сожалению, в этот город доставки пока нет.
                 </div>
 
@@ -236,17 +233,13 @@
         </div>
     </div>
 
-    <!-- BOTTOM OVERLAYS -->
     <div class="bottom-overlay-container">
-
-        <!-- Cookie Consent -->
         <div class="info-toast" id="cookieToast">
             <h4><i class="fas fa-cookie-bite"></i> Мы используем куки</h4>
             <p>Продолжая работу с сайтом, вы разрешаете использование cookie-файлов для лучшего UX.</p>
             <button class="btn-small btn-white" onclick="geoService.acceptCookies()">Хорошо</button>
         </div>
 
-        <!-- Geo Confirm -->
         <div class="info-toast" id="geoToast">
             <h4><i class="fas fa-map-marker-alt"></i> Ваш город Новосибирск?</h4>
             <div class="toast-actions">

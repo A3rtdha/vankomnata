@@ -3,6 +3,7 @@ import { productService } from './modules/productService.js';
 window.productService = productService;
 
 const AUTH_URL = '/api/auth.php';
+const ADMIN_REVIEWS_URL = '/api/admin_reviews.php';
 
 const escapeHtml = (str) => {
     if (str == null) return '';
@@ -55,8 +56,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const copyJsonBtn = document.getElementById('copyJsonBtn');
     const saveBulkBtn = document.getElementById('saveBulkBtn');
 
+    const reviewsTableBody = document.getElementById('reviewsTableBody');
+    const noReviewsState = document.getElementById('noReviewsState');
+    const statPendingReviews = document.getElementById('statPendingReviews');
+    const refreshReviewsBtn = document.getElementById('refreshReviewsBtn');
+    const reviewsModerationSection = document.getElementById('reviewsModerationSection');
+
     let allProducts = [];
     let isAuthenticated = false;
+
+    let currentPage = 1;
+    const itemsPerPage = 15;
+
+    const findProductById = (id) =>
+        allProducts.find((p) => p.id == id) ?? productService.getById(id);
 
     const showToast = (message, type = 'success') => {
         const container = document.getElementById('toastContainer');
@@ -132,10 +145,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             </span>`;
     };
 
-    const jsAttr = (value) => JSON.stringify(String(value ?? ''));
-
     const renderTableRow = (product) => {
-        const idAttr = jsAttr(product.id);
+        const productId = escapeHtml(String(product.id ?? ''));
         const img = escapeHtml(product.img || '');
         const name = escapeHtml(product.name);
         const category = escapeHtml(product.category);
@@ -167,15 +178,106 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </td>
                 <td class="py-4 px-6">${renderStockBadge(product)}</td>
                 <td class="py-4 px-6 text-right space-x-1 whitespace-nowrap">
-                    <button type="button" onclick="editProduct(${idAttr})" class="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all" title="Редактировать">
-                        <i class="fa-solid fa-pen-to-square text-sm"></i>
+                    <button type="button" data-action="edit" data-product-id="${productId}" class="js-table-action p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all" title="Редактировать">
+                        <i class="fa-solid fa-pen-to-square text-sm pointer-events-none"></i>
                     </button>
-                    <button type="button" onclick="deleteProduct(${idAttr})" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Удалить">
-                        <i class="fa-solid fa-trash text-sm"></i>
+                    <button type="button" data-action="delete" data-product-id="${productId}" class="js-table-action p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Удалить">
+                        <i class="fa-solid fa-trash text-sm pointer-events-none"></i>
                     </button>
                 </td>
             </tr>`;
     };
+
+    tableBody?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn || !tableBody.contains(btn)) return;
+
+        const id = btn.getAttribute('data-product-id');
+        const action = btn.getAttribute('data-action');
+        if (id == null || id === '') return;
+
+        if (action === 'edit') {
+            window.editProduct(id);
+        } else if (action === 'delete') {
+            window.deleteProduct(id);
+        }
+    });
+
+    function renderPagination(totalItems, totalPages) {
+        let container = document.getElementById('paginationContainer');
+        if (!container) {
+            const tableSection = document.getElementById('productsTableSection');
+            if (!tableSection) return;
+            container = document.createElement('div');
+            container.id = 'paginationContainer';
+            container.className =
+                'flex items-center justify-between px-6 py-4 border-t border-slate-100 bg-slate-50/50 text-sm text-slate-500';
+            tableSection.appendChild(container);
+        }
+
+        if (totalPages <= 1) {
+            container.classList.add('hidden');
+            return;
+        }
+        container.classList.remove('hidden');
+
+        const from = (currentPage - 1) * itemsPerPage + 1;
+        const to = Math.min(currentPage * itemsPerPage, totalItems);
+
+        let html = `
+            <div>
+                Показано <span class="font-semibold text-slate-900">${from}–${to}</span> из
+                <span class="font-semibold text-slate-900">${totalItems}</span> товаров
+            </div>
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+                <button type="button" id="prevPageBtn" ${currentPage === 1 ? 'disabled' : ''}
+                    class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium text-xs">
+                    Назад
+                </button>`;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if (totalPages > 6 && Math.abs(currentPage - i) > 2 && i !== 1 && i !== totalPages) {
+                if (i === 2 || i === totalPages - 1) {
+                    html += '<span class="px-2 text-slate-400">…</span>';
+                }
+                continue;
+            }
+            html += `
+                <button type="button" class="page-num-btn px-3 py-1.5 rounded-lg border text-xs transition-all ${
+                    currentPage === i
+                        ? 'bg-sky-600 border-sky-600 text-white font-semibold'
+                        : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-600'
+                }" data-page="${i}">${i}</button>`;
+        }
+
+        html += `
+                <button type="button" id="nextPageBtn" ${currentPage === totalPages ? 'disabled' : ''}
+                    class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium text-xs">
+                    Вперёд
+                </button>
+            </div>`;
+
+        container.innerHTML = html;
+
+        document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+        document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        });
+        container.querySelectorAll('.page-num-btn').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                currentPage = Number(e.currentTarget.getAttribute('data-page'));
+                renderTable();
+            });
+        });
+    }
 
     async function renderTable() {
         if (!isAuthenticated) return;
@@ -183,13 +285,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         productService.loaded = false;
         await productService.load();
         allProducts = productService.getAll();
-        const products = applyTableFilters(allProducts);
+        const filteredProducts = applyTableFilters(allProducts);
 
         updateStats(allProducts);
 
         const categories = [...new Set(allProducts.map((p) => p.category).filter(Boolean))].sort();
         if (catList) {
-            catList.innerHTML = categories.map((c) => `<option value="${escapeHtml(c)}">`).join('');
+            catList.innerHTML = categories
+                .map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`)
+                .join('');
         }
         if (categoryFilter) {
             const current = categoryFilter.value;
@@ -202,12 +306,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
+        const totalItems = filteredProducts.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+        if (currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+
         if (tableBody) {
-            tableBody.innerHTML = products.map(renderTableRow).join('');
+            tableBody.innerHTML = paginatedProducts.map(renderTableRow).join('');
         }
         if (noProductsState) {
-            noProductsState.classList.toggle('hidden', products.length > 0);
+            noProductsState.classList.toggle('hidden', totalItems > 0);
         }
+
+        renderPagination(totalItems, totalPages);
     }
 
     const normalizeJsonInput = (raw) => {
@@ -223,7 +338,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return trimmed;
     };
 
+    const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
     const uploadImage = async (file) => {
+        if (file.size > MAX_IMAGE_BYTES) {
+            throw new Error('Файл слишком большой. Максимум 10 МБ.');
+        }
+
         const formData = new FormData();
         formData.append('file', file);
         const res = await fetch('/api/upload.php', {
@@ -337,8 +458,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     window.editProduct = (id) => {
-        const p = productService.getById(id);
-        if (!p) return;
+        const p = findProductById(id);
+        if (!p) {
+            console.error('Товар не найден для редактирования, id:', id);
+            showToast('Товар не найден. Обновите страницу.', 'error');
+            return;
+        }
 
         resetProductForm();
         productIdHidden.value = p.id;
@@ -366,9 +491,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     window.deleteProduct = async (id) => {
-        if (!confirm('Удалить этот товар из каталога?')) return;
+        const p = findProductById(id);
+        if (!p) {
+            console.error('Товар не найден для удаления, id:', id);
+            showToast('Товар не найден. Обновите страницу.', 'error');
+            return;
+        }
+        if (!confirm(`Удалить товар «${p.name}» из каталога?`)) return;
         try {
-            await productService.delete(id);
+            await productService.delete(p.id);
             showToast('Товар удалён', 'success');
             await renderTable();
         } catch (err) {
@@ -400,7 +531,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             if (id) {
-                const existing = productService.getById(id);
+                const existing = findProductById(id);
                 if (
                     getStockRadio() === 'in' &&
                     document.getElementById('productStockQty').value === '' &&
@@ -499,8 +630,122 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (e.target === bulkModal) closeBulkModal();
     });
 
-    searchInput?.addEventListener('input', () => renderTable());
-    categoryFilter?.addEventListener('change', () => renderTable());
+    searchInput?.addEventListener('input', () => {
+        currentPage = 1;
+        renderTable();
+    });
+    categoryFilter?.addEventListener('change', () => {
+        currentPage = 1;
+        renderTable();
+    });
+
+    const renderReviewStars = (rating) => {
+        const n = Math.max(0, Math.min(5, Number(rating) || 0));
+        return Array.from({ length: 5 }, (_, i) =>
+            i < n
+                ? '<i class="fas fa-star text-amber-400"></i>'
+                : '<i class="far fa-star text-slate-300"></i>'
+        ).join('');
+    };
+
+    const renderReviewsTable = (reviews) => {
+        const pending = reviews.filter((r) => !r.is_approved).length;
+        if (statPendingReviews) statPendingReviews.textContent = pending;
+
+        if (!reviewsTableBody) return;
+
+        if (reviews.length === 0) {
+            reviewsTableBody.innerHTML = '';
+            noReviewsState?.classList.remove('hidden');
+            return;
+        }
+
+        noReviewsState?.classList.add('hidden');
+
+        reviewsTableBody.innerHTML = reviews
+            .map((r) => {
+                const status = r.is_approved
+                    ? '<span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full">Опубликован</span>'
+                    : '<span class="px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full">На модерации</span>';
+                const textPreview =
+                    r.text.length > 100 ? `${escapeHtml(r.text.slice(0, 100))}…` : escapeHtml(r.text);
+                const approveBtn = !r.is_approved
+                    ? `<button type="button" data-review-action="approve" data-review-id="${r.id}" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all" title="Одобрить"><i class="fa-solid fa-check"></i></button>`
+                    : '';
+
+                return `
+                    <tr class="hover:bg-slate-50/50 ${r.is_approved ? '' : 'bg-amber-50/30'}">
+                        <td class="py-3 px-6">
+                            <div class="font-semibold text-slate-900 text-sm">${escapeHtml(r.product_name)}</div>
+                            <div class="text-xs text-slate-400">ID товара: ${r.product_id}</div>
+                        </td>
+                        <td class="py-3 px-6 text-sm text-slate-700">${escapeHtml(r.author)}</td>
+                        <td class="py-3 px-6 text-sm">${renderReviewStars(r.rating)}</td>
+                        <td class="py-3 px-6 text-sm text-slate-600 max-w-xs">${textPreview}</td>
+                        <td class="py-3 px-6">${status}</td>
+                        <td class="py-3 px-6 text-right whitespace-nowrap space-x-1">
+                            ${approveBtn}
+                            <button type="button" data-review-action="delete" data-review-id="${r.id}" class="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Удалить">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            })
+            .join('');
+    };
+
+    const loadAdminReviews = async () => {
+        if (!isAuthenticated) return;
+
+        try {
+            const res = await fetch(ADMIN_REVIEWS_URL, { credentials: 'same-origin' });
+            if (res.status === 401) return;
+            if (!res.ok) throw new Error('Не удалось загрузить отзывы');
+            const reviews = await res.json();
+            renderReviewsTable(Array.isArray(reviews) ? reviews : []);
+        } catch (err) {
+            console.error(err);
+            showToast(err.message || 'Ошибка загрузки отзывов', 'error');
+        }
+    };
+
+    reviewsTableBody?.addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-review-action]');
+        if (!btn) return;
+
+        const reviewId = btn.getAttribute('data-review-id');
+        const action = btn.getAttribute('data-review-action');
+        if (!reviewId) return;
+
+        if (action === 'delete' && !confirm('Удалить этот отзыв?')) return;
+
+        try {
+            let res;
+            if (action === 'approve') {
+                res = await fetch(`${ADMIN_REVIEWS_URL}?action=approve&id=${encodeURIComponent(reviewId)}`, {
+                    method: 'POST',
+                    credentials: 'same-origin'
+                });
+            } else {
+                res = await fetch(`${ADMIN_REVIEWS_URL}?id=${encodeURIComponent(reviewId)}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin'
+                });
+            }
+
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.error || 'Ошибка операции');
+
+            showToast(data.message || 'Готово', 'success');
+            await loadAdminReviews();
+            productService.loaded = false;
+        } catch (err) {
+            showToast(err.message || 'Ошибка', 'error');
+        }
+    });
+
+    refreshReviewsBtn?.addEventListener('click', () => loadAdminReviews());
 
     const setAdminUiAuthed = (isAuthed, userName) => {
         isAuthenticated = isAuthed;
@@ -508,9 +753,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (adminLogoutBtn) adminLogoutBtn.style.visibility = isAuthed ? 'visible' : 'hidden';
         if (openAddModalBtn) openAddModalBtn.disabled = !isAuthed;
         if (openBulkModalBtn) openBulkModalBtn.disabled = !isAuthed;
+        if (reviewsModerationSection) {
+            if (isAuthed) reviewsModerationSection.removeAttribute('hidden');
+            else reviewsModerationSection.setAttribute('hidden', '');
+        }
         if (adminUserDisplayName && userName) {
             adminUserDisplayName.textContent = userName;
         }
+        if (!isAuthed && statPendingReviews) statPendingReviews.textContent = '0';
     };
 
     const checkAuth = async () => {
@@ -521,6 +771,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data.authenticated) {
                 setAdminUiAuthed(true, data.user || 'admin');
                 await renderTable();
+                await loadAdminReviews();
             } else {
                 setAdminUiAuthed(false);
             }
@@ -553,6 +804,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setAdminUiAuthed(true, data.user || 'admin');
                 showToast('Добро пожаловать в панель', 'success');
                 await renderTable();
+                await loadAdminReviews();
             } else {
                 setAuthError(data.error || 'Ошибка входа');
             }

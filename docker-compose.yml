@@ -3,6 +3,29 @@ services:
   vancom:
     build: .
     ports:
-      - "8000:8000"
+      - "8080:8000"
     volumes:
       - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: vancom_db
+      MYSQL_USER: vancom_user
+      MYSQL_PASSWORD: vancom_pass
+      MYSQL_ROOT_PASSWORD: vancom_root_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pvancom_root_pass"]
+      timeout: 10s
+      retries: 5
+
+volumes:
+  db_data:

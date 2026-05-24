@@ -1,30 +1,14 @@
 <?php
 header('Content-Type: application/json; charset=utf-8');
 
-$dataFile = __DIR__ . '/../data/products.json';
-
-if (!file_exists($dataFile)) {
-    file_put_contents($dataFile, json_encode([], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
-}
+require_once __DIR__ . '/db.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 $id = isset($_GET['id']) ? $_GET['id'] : null;
 
-// ЗАЩИТА: методы изменения данных требуют авторизацию
 if ($method === 'POST' || $method === 'PUT' || $method === 'DELETE') {
     require_once __DIR__ . '/auth_check.php';
-}
-
-function readProducts($path) {
-    $raw = file_get_contents($path);
-    $data = json_decode($raw, true);
-    return is_array($data) ? $data : [];
-}
-
-function saveProducts($path, $data) {
-    $json = json_encode(array_values($data), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-    file_put_contents($path, $json, LOCK_EX);
 }
 
 function getBody() {
@@ -33,21 +17,45 @@ function getBody() {
     return is_array($data) ? $data : [];
 }
 
+function formatProductTypes($p) {
+    if (!$p) return null;
+    $p['id'] = (int)$p['id'];
+    $p['price'] = (float)$p['price'];
+    $p['oldPrice'] = $p['oldPrice'] !== null ? (float)$p['oldPrice'] : null;
+    $p['rating'] = $p['rating'] !== null ? (float)$p['rating'] : null;
+    $p['reviews'] = (int)$p['reviews'];
+    $p['stock'] = (int)$p['stock'];
+    return $p;
+}
+
+function normalizeStock($stock) {
+    if (!isset($stock)) {
+        return 1;
+    }
+    if ($stock === false || $stock === 'false' || $stock === 0 || $stock === '0') {
+        return 0;
+    }
+    return is_numeric($stock) ? (int)$stock : 1;
+}
+
 if ($method === 'GET') {
-    $products = readProducts($dataFile);
     if ($id !== null) {
-        foreach ($products as $p) {
-            if ((string)$p['id'] === (string)$id) {
-                echo json_encode($p, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-                exit;
-            }
+        $stmt = $pdo->prepare('SELECT * FROM `products` WHERE `id` = ?');
+        $stmt->execute([$id]);
+        $product = $stmt->fetch();
+        if ($product) {
+            echo json_encode(formatProductTypes($product), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+            exit;
         }
         http_response_code(404);
         echo json_encode(['error' => 'Not found'], JSON_UNESCAPED_UNICODE);
         exit;
     }
 
-    echo json_encode($products, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    $stmt = $pdo->query('SELECT * FROM `products` ORDER BY `id` ASC');
+    $products = $stmt->fetchAll();
+    $formatted = array_map('formatProductTypes', $products);
+    echo json_encode($formatted, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
@@ -58,19 +66,40 @@ if ($method === 'POST' && $action === 'import') {
         echo json_encode(['error' => 'Invalid payload'], JSON_UNESCAPED_UNICODE);
         exit;
     }
-    $products = readProducts($dataFile);
-    $maxId = 0;
-    foreach ($products as $p) {
-        if (isset($p['id']) && $p['id'] > $maxId) $maxId = $p['id'];
+
+    $pdo->beginTransaction();
+    try {
+        $stmt = $pdo->prepare('INSERT INTO `products`
+            (`name`, `category`, `price`, `oldPrice`, `badge`, `rating`, `reviews`, `stock`, `desc`, `img`)
+            VALUES (:name, :category, :price, :oldPrice, :badge, :rating, :reviews, :stock, :desc, :img)');
+
+        foreach ($items as $item) {
+            if (!is_array($item)) continue;
+
+            $stmt->execute([
+                ':name'     => $item['name'] ?? '',
+                ':category' => $item['category'] ?? '',
+                ':price'    => $item['price'] ?? 0,
+                ':oldPrice' => !empty($item['oldPrice']) ? $item['oldPrice'] : null,
+                ':badge'    => !empty($item['badge']) ? $item['badge'] : null,
+                ':rating'   => !empty($item['rating']) ? $item['rating'] : null,
+                ':reviews'  => isset($item['reviews']) ? (int)$item['reviews'] : 0,
+                ':stock'    => normalizeStock($item['stock'] ?? null),
+                ':desc'     => $item['desc'] ?? null,
+                ':img'      => $item['img'] ?? ''
+            ]);
+        }
+        $pdo->commit();
+    } catch (\Exception $e) {
+        $pdo->rollBack();
+        http_response_code(500);
+        echo json_encode(['error' => 'Импорт прерван из-за ошибки: ' . $e->getMessage()], JSON_UNESCAPED_UNICODE);
+        exit;
     }
-    $nextId = $maxId + 1;
-    foreach ($items as $item) {
-        if (!is_array($item)) continue;
-        $item['id'] = $nextId++;
-        $products[] = $item;
-    }
-    saveProducts($dataFile, $products);
-    echo json_encode($products, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+    $stmt = $pdo->query('SELECT * FROM `products` ORDER BY `id` ASC');
+    $products = $stmt->fetchAll();
+    echo json_encode(array_map('formatProductTypes', $products), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
@@ -82,41 +111,97 @@ if ($method === 'POST') {
         exit;
     }
 
-    $products = readProducts($dataFile);
-    $maxId = 0;
-    foreach ($products as $p) {
-        if (isset($p['id']) && $p['id'] > $maxId) $maxId = $p['id'];
-    }
-    $product['id'] = $maxId + 1;
-    $products[] = $product;
-    saveProducts($dataFile, $products);
-    echo json_encode($product, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    $stockVal = normalizeStock($product['stock'] ?? null);
+
+    $stmt = $pdo->prepare('INSERT INTO `products`
+        (`name`, `category`, `price`, `oldPrice`, `badge`, `rating`, `reviews`, `stock`, `desc`, `img`)
+        VALUES (:name, :category, :price, :oldPrice, :badge, :rating, :reviews, :stock, :desc, :img)');
+
+    $stmt->execute([
+        ':name'     => $product['name'],
+        ':category' => $product['category'],
+        ':price'    => $product['price'],
+        ':oldPrice' => !empty($product['oldPrice']) ? $product['oldPrice'] : null,
+        ':badge'    => !empty($product['badge']) ? $product['badge'] : null,
+        ':rating'   => !empty($product['rating']) ? $product['rating'] : null,
+        ':reviews'  => isset($product['reviews']) ? (int)$product['reviews'] : 0,
+        ':stock'    => $stockVal,
+        ':desc'     => $product['desc'] ?? null,
+        ':img'      => $product['img']
+    ]);
+
+    $newId = $pdo->lastInsertId();
+    $stmt = $pdo->prepare('SELECT * FROM `products` WHERE `id` = ?');
+    $stmt->execute([$newId]);
+    $created = $stmt->fetch();
+    echo json_encode(formatProductTypes($created), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
 if ($method === 'PUT' && $id !== null) {
     $payload = getBody();
-    $products = readProducts($dataFile);
-    foreach ($products as $index => $p) {
-        if ((string)$p['id'] === (string)$id) {
-            $updated = array_merge($p, $payload, ['id' => $p['id']]);
-            $products[$index] = $updated;
-            saveProducts($dataFile, $products);
-            echo json_encode($updated, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-            exit;
-        }
+
+    $stmt = $pdo->prepare('SELECT * FROM `products` WHERE `id` = ?');
+    $stmt->execute([$id]);
+    $existing = $stmt->fetch();
+
+    if (!$existing) {
+        http_response_code(404);
+        echo json_encode(['error' => 'Not found'], JSON_UNESCAPED_UNICODE);
+        exit;
     }
-    http_response_code(404);
-    echo json_encode(['error' => 'Not found'], JSON_UNESCAPED_UNICODE);
+
+    $name = $payload['name'] ?? $existing['name'];
+    $category = $payload['category'] ?? $existing['category'];
+    $price = $payload['price'] ?? $existing['price'];
+    $oldPrice = array_key_exists('oldPrice', $payload) ? $payload['oldPrice'] : $existing['oldPrice'];
+    $badge = array_key_exists('badge', $payload) ? $payload['badge'] : $existing['badge'];
+    $rating = array_key_exists('rating', $payload) ? $payload['rating'] : $existing['rating'];
+    $reviews = array_key_exists('reviews', $payload) ? $payload['reviews'] : $existing['reviews'];
+    $desc = array_key_exists('desc', $payload) ? $payload['desc'] : $existing['desc'];
+    $img = $payload['img'] ?? $existing['img'];
+
+    $stockVal = array_key_exists('stock', $payload)
+        ? normalizeStock($payload['stock'])
+        : (int)$existing['stock'];
+
+    $stmt = $pdo->prepare('UPDATE `products` SET
+        `name` = :name,
+        `category` = :category,
+        `price` = :price,
+        `oldPrice` = :oldPrice,
+        `badge` = :badge,
+        `rating` = :rating,
+        `reviews` = :reviews,
+        `stock` = :stock,
+        `desc` = :desc,
+        `img` = :img
+        WHERE `id` = :id');
+
+    $stmt->execute([
+        ':name'     => $name,
+        ':category' => $category,
+        ':price'    => $price,
+        ':oldPrice' => !empty($oldPrice) ? $oldPrice : null,
+        ':badge'    => !empty($badge) ? $badge : null,
+        ':rating'   => !empty($rating) ? $rating : null,
+        ':reviews'  => isset($reviews) ? (int)$reviews : 0,
+        ':stock'    => $stockVal,
+        ':desc'     => !empty($desc) ? $desc : null,
+        ':img'      => $img,
+        ':id'       => $id
+    ]);
+
+    $stmt = $pdo->prepare('SELECT * FROM `products` WHERE `id` = ?');
+    $stmt->execute([$id]);
+    $updated = $stmt->fetch();
+    echo json_encode(formatProductTypes($updated), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     exit;
 }
 
 if ($method === 'DELETE' && $id !== null) {
-    $products = readProducts($dataFile);
-    $filtered = array_filter($products, function($p) use ($id) {
-        return (string)$p['id'] !== (string)$id;
-    });
-    saveProducts($dataFile, $filtered);
+    $stmt = $pdo->prepare('DELETE FROM `products` WHERE `id` = ?');
+    $stmt->execute([$id]);
     echo json_encode(['success' => true], JSON_UNESCAPED_UNICODE);
     exit;
 }

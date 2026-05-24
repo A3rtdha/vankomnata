@@ -1,275 +1,364 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ванная комната | Панель управления</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/variables.css">
-
-    <style>
-        :root {
-            --admin-bg: #f4f6fb;
-            --admin-card: #ffffff;
-            --admin-border: #e8ecf3;
-            --admin-muted: #6b7280;
-            --admin-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    <title>Ванкомната — Панель управления</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
         }
-
-        body {
-            font-family: var(--font-main);
-            background: var(--admin-bg);
-            padding: 24px;
-            color: var(--color-primary);
-        }
-
-        .admin-container { max-width: 1200px; margin: 0 auto; }
-
-        .admin-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 24px; background: var(--admin-card); padding: 18px 22px;
-            border-radius: 14px; box-shadow: var(--admin-shadow);
-        }
-        .admin-title { font-size: 1.4rem; font-weight: 700; color: var(--color-primary); }
-        .admin-subtitle { color: var(--admin-muted); font-size: 0.9rem; }
-        .admin-actions { display: flex; gap: 10px; align-items: center; }
-
-        .admin-grid { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
-
-        .card {
-            background: var(--admin-card);
-            border: 1px solid var(--admin-border);
-            border-radius: 14px;
-            box-shadow: var(--admin-shadow);
-            padding: 22px;
-        }
-        .card.sticky { position: sticky; top: 18px; }
-
-        .section-title { font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
-        .muted { color: var(--admin-muted); font-size: 0.85rem; }
-        .divider { border: none; border-top: 1px solid var(--admin-border); margin: 18px 0; }
-
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; color: #111827; }
-        .form-control {
-            width: 100%; padding: 10px 12px; border: 1px solid var(--admin-border);
-            border-radius: 10px; font-family: inherit; background: #fff;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-        .form-control:focus { outline: none; border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
-
-        .btn-primary, .btn-secondary, .btn-ghost {
-            border: none; border-radius: 10px; cursor: pointer;
-            font-weight: 600; padding: 10px 16px;
-        }
-        .btn-primary { background: var(--color-accent); color: white; width: 100%; }
-        .btn-secondary { background: var(--color-primary); color: white; text-decoration: none; }
-        .btn-ghost { background: #eef2ff; color: #334155; }
-        .btn-danger { background: #e74c3c; color: white; margin-top: 10px; width: 100%; }
-
-        .table-card { background: var(--admin-card); padding: 0; border: 1px solid var(--admin-border); border-radius: 14px; box-shadow: var(--admin-shadow); overflow: hidden; }
-        .table-header { padding: 16px 20px; border-bottom: 1px solid var(--admin-border); display: flex; justify-content: space-between; align-items: center; }
-        .table-controls { display: flex; gap: 10px; align-items: center; }
-        .table-controls .form-control { max-width: 220px; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 14px 16px; border-bottom: 1px solid var(--admin-border); }
-        th { background: #f8fafc; font-weight: 600; color: #0f172a; font-size: 0.85rem; }
-        tr:hover td { background: #fafbff; }
-        .img-preview { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; }
-        .pill { background: #eef2ff; color: #3730a3; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; }
-        .price-cell { font-weight: 600; color: #0f172a; }
-        .action-btn { cursor: pointer; border: none; background: none; padding: 6px; font-size: 1.1rem; transition: 0.2s; }
-        .btn-edit { color: #2563eb; }
-        .btn-delete { color: #dc2626; }
-
-        .import-grid { display: grid; gap: 10px; }
-        .status-line { margin-top: 8px; font-size: 0.85rem; color: var(--admin-muted); }
-        .status-line.success { color: #15803d; }
-        .status-line.error { color: #b91c1c; }
-
-        .admin-auth {
-            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.35);
-            display: flex; align-items: center; justify-content: center; z-index: 999;
-            backdrop-filter: blur(6px);
-        }
-        .admin-auth-card {
-            width: 360px; background: var(--admin-card); border-radius: 14px;
-            padding: 24px; box-shadow: var(--admin-shadow); border: 1px solid var(--admin-border);
-        }
-        .admin-auth-card h3 { margin-bottom: 8px; }
-
-        .tab-buttons { display: flex; gap: 10px; border-bottom: 1px solid var(--admin-border); margin-bottom: 12px; }
-        .tab-btn {
-            padding: 8px 14px; border: none; background: none; cursor: pointer;
-            font-weight: 600; color: var(--admin-muted);
-        }
-        .tab-btn.active { color: var(--color-primary); border-bottom: 2px solid var(--color-accent); }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-    </style>
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <div class="admin-container">
-        <div class="admin-header">
-            <div>
-                <div class="admin-title">📦 Ванная комната — Менеджер товаров</div>
-                <div class="admin-subtitle">Обновления появляются сразу после сохранения</div>
-            </div>
-            <div class="admin-actions">
-                <button class="btn-ghost" id="openAddModal">Добавить товары</button>
-                <button class="btn-ghost" id="adminLogoutBtn" type="button" style="display:none;">Выйти</button>
-                <a href="index.html" class="btn-secondary">На сайт</a>
-            </div>
-        </div>
+<body class="h-full font-sans antialiased text-slate-800 flex flex-col">
 
-        <div class="admin-grid">
-        <main class="table-card">
-            <div class="table-header">
-                <div class="section-title">Каталог</div>
-                <div class="table-controls">
-                    <input type="text" id="adminSearch" class="form-control" placeholder="Поиск по названию">
-                    <select id="adminCategoryFilter" class="form-control">
-                        <option value="all">Все категории</option>
-                    </select>
-                    <div class="muted">Всего: <span id="productsCount">0</span></div>
+    <div id="adminAuthOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm transition-all duration-300" style="display: flex;">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 p-8 w-full max-w-md mx-4">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-sky-50 rounded-full text-sky-500 mb-4">
+                    <i class="fa-solid fa-lock text-2xl"></i>
                 </div>
+                <h3 class="text-2xl font-bold text-slate-900">Вход в админку</h3>
+                <p class="text-sm text-slate-400 mt-1">Панель управления каталогом товаров</p>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Фото</th>
-                        <th>Название</th>
-                        <th>Категория</th>
-                        <th>Цена</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody id="adminTableBody">
-                    <!-- JS render -->
-                </tbody>
-            </table>
-        </main>
-        </div>
-    </div>
 
-    <script type="module" src="assets/js/admin.js"></script>
+            <form id="adminAuthForm" class="space-y-4">
+                <div>
+                    <label for="adminLogin" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Логин</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-user text-sm"></i>
+                        </span>
+                        <input type="text" id="adminLogin" required autocomplete="username" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="Логин">
+                    </div>
+                </div>
 
-    <div class="admin-auth" id="adminAuthOverlay">
-        <div class="admin-auth-card">
-            <h3>Вход в админку</h3>
-            <p class="muted">Введите пароль, чтобы продолжить</p>
-            <form id="adminAuthForm">
-                <input type="text" id="adminLogin" class="form-control" placeholder="Логин">
-                <input type="password" id="adminPassword" class="form-control" placeholder="Пароль">
-                <div id="adminAuthError" class="status-line error"></div>
-                <button type="submit" class="btn-primary" style="margin-top: 10px;">Войти</button>
+                <div>
+                    <label for="adminPassword" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Пароль</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-key text-sm"></i>
+                        </span>
+                        <input type="password" id="adminPassword" required autocomplete="current-password" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div id="adminAuthError" class="hidden text-rose-600 text-xs bg-rose-50 border border-rose-100 p-3 rounded-lg text-center mt-2 font-medium" role="alert"></div>
+
+                <button type="submit" class="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 mt-6 active:scale-[0.98]">
+                    <span>Войти в систему</span>
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                </button>
             </form>
         </div>
     </div>
 
-    <div class="admin-auth" id="addModal" style="display:none;">
-        <div class="admin-auth-card" style="width: 720px;">
-            <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:10px;">
-                <h3>Добавление товаров</h3>
-                <button class="action-btn" id="closeAddModal">&times;</button>
-            </div>
-
-            <div class="tab-buttons">
-                <button class="tab-btn active" data-tab="single">Единичное добавление</button>
-                <button class="tab-btn" data-tab="bulk">Bulk</button>
-            </div>
-
-            <div class="tab-content active" data-tab="single">
-                <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
-                    <span class="muted">Режим:</span>
-                    <button class="btn-ghost" id="singleModeManual">Ручной</button>
-                    <button class="btn-ghost" id="singleModeJson">JSON</button>
+    <header class="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">
+                        <i class="fa-solid fa-bath"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold text-slate-900 leading-tight">Ванкомната</h1>
+                        <span class="text-xs text-sky-600 font-medium tracking-wide uppercase">Панель управления</span>
+                    </div>
                 </div>
 
-                <form id="singleForm">
-                    <input type="hidden" id="prodId">
-                    <div id="singleManualBlock">
-                        <div class="form-group">
-                            <label>Название</label>
-                            <input type="text" id="prodName" class="form-control" required placeholder="Напр: Мыльница">
-                        </div>
-                        <div class="form-group">
-                            <label>Категория</label>
-                            <input type="text" id="prodCategory" class="form-control" list="catList" required>
-                            <datalist id="catList"></datalist>
-                        </div>
-                        <div class="form-group">
-                            <label>Цена (₽)</label>
-                            <input type="number" id="prodPrice" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Старая цена (₽)</label>
-                            <input type="number" id="prodOldPrice" class="form-control" placeholder="Опционально">
-                        </div>
-                        <div class="form-group">
-                            <label>Бейдж (Хит/Новинка/Скидка)</label>
-                            <input type="text" id="prodBadge" class="form-control" placeholder="Опционально">
-                        </div>
-                        <div class="form-group">
-                            <label>Описание</label>
-                            <textarea id="prodDesc" class="form-control" rows="3" placeholder="Короткое описание"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Рейтинг (0-5)</label>
-                            <input type="number" step="0.1" id="prodRating" class="form-control" placeholder="Опционально">
-                        </div>
-                        <div class="form-group">
-                            <label>Отзывы (кол-во)</label>
-                            <input type="number" id="prodReviews" class="form-control" placeholder="Опционально">
-                        </div>
-                        <div class="form-group">
-                            <label>Остаток</label>
-                            <input type="number" id="prodStock" class="form-control" placeholder="Опционально">
-                        </div>
-                        <div class="form-group">
-                            <label>URL Картинки</label>
-                            <input type="url" id="prodImg" class="form-control" required placeholder="https://...">
-                        </div>
-                        <div class="form-group">
-                            <label>Загрузка картинки</label>
-                            <input type="file" id="prodImgFile" class="form-control" accept="image/*">
-                            <div class="muted">Файл загрузится на сервер, URL подставится автоматически.</div>
+                <div class="flex items-center gap-4">
+                    <a href="index.html" class="hidden sm:inline-flex py-2 px-3 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-lg transition-all items-center gap-2">
+                        <i class="fa-solid fa-store"></i>
+                        <span>На сайт</span>
+                    </a>
+                    <div class="hidden sm:flex items-center gap-2 py-1.5 px-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-xs font-semibold text-slate-600" id="adminUserDisplayName">Сессия активна</span>
+                    </div>
+                    <button type="button" id="adminLogoutBtn" class="py-2 px-4 border border-rose-200 hover:bg-rose-50 text-rose-600 hover:text-rose-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 active:scale-[0.98]" style="visibility: hidden;">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Выйти</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center gap-5">
+                <div class="w-12 h-12 bg-sky-50 text-sky-500 rounded-xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Всего товаров</span>
+                    <span class="text-2xl font-bold text-slate-900" id="statTotalProducts">0</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center gap-5">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-tags"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Категорий</span>
+                    <span class="text-2xl font-bold text-slate-900" id="statTotalCategories">0</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center gap-5">
+                <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Нет в наличии</span>
+                    <span class="text-2xl font-bold text-slate-900" id="statOutOfStock">0</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-grow max-w-2xl">
+                <div class="relative flex-grow">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="Поиск товара по названию или ID...">
+                </div>
+                <div class="relative min-w-[180px]">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
+                        <i class="fa-solid fa-filter text-xs"></i>
+                    </span>
+                    <select id="categoryFilter" class="w-full pl-8 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm appearance-none text-slate-600">
+                        <option value="all">Все категории</option>
+                    </select>
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 pointer-events-none">
+                        <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 self-end md:self-auto">
+                <button type="button" id="openBulkModalBtn" disabled class="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg transition-all flex items-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+                    <i class="fa-solid fa-file-import"></i>
+                    <span>Импорт/Экспорт JSON</span>
+                </button>
+                <button type="button" id="openAddModalBtn" disabled class="py-2 px-4 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Добавить товар</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Превью</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Товар</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Категория</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Цена</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Наличие</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+
+            <div id="noProductsState" class="hidden py-16 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-slate-50 text-slate-400 rounded-full mb-4">
+                    <i class="fa-solid fa-box-open text-2xl"></i>
+                </div>
+                <h4 class="text-slate-900 font-bold text-lg">Товары не найдены</h4>
+                <p class="text-slate-400 text-sm max-w-xs mx-auto mt-1">Попробуйте сбросить параметры поиска или добавить новую позицию в каталог.</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="productModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-2xl transform transition-all my-8">
+            <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-box-open text-sky-500"></i>
+                    <span id="modalTitleText">Добавление товара</span>
+                </h3>
+                <button type="button" id="closeProductModalBtn" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form id="productForm" class="p-6 space-y-6">
+                <input type="hidden" id="productIdHidden">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                    <div id="productIdDisplayWrap" class="hidden md:col-span-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">ID товара (редактирование)</label>
+                        <input type="text" id="productIdDisplay" readonly class="w-full px-4 py-2.5 bg-slate-100 border border-slate-200 text-slate-500 font-mono rounded-lg text-sm select-all cursor-not-allowed focus:outline-none" value="">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="productName" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Название товара *</label>
+                        <input type="text" id="productName" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="Например: Акриловая ванна Triton 170x70">
+                    </div>
+
+                    <div>
+                        <label for="productCategory" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Категория *</label>
+                        <input type="text" id="productCategory" list="catList" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="Например: Ванны">
+                        <datalist id="catList"></datalist>
+                    </div>
+
+                    <div>
+                        <label for="productBadge" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Бейдж / Ярлык</label>
+                        <input type="text" id="productBadge" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="Например: HIT, NEW, -15%">
+                    </div>
+
+                    <div>
+                        <label for="productPrice" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Цена (руб) *</label>
+                        <input type="number" id="productPrice" required min="0" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="15000">
+                    </div>
+
+                    <div>
+                        <label for="productOldPrice" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Старая цена (без скидки)</label>
+                        <input type="number" id="productOldPrice" min="0" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="Заполните только для скидки">
+                    </div>
+
+                    <div class="md:col-span-2 space-y-3">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Статус наличия *</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div class="flex items-center justify-around h-[46px] bg-slate-50 border border-slate-200 rounded-lg px-4">
+                                <label class="inline-flex items-center cursor-pointer text-sm font-medium text-slate-700">
+                                    <input type="radio" name="productStock" value="in" checked class="w-4 h-4 text-sky-600 focus:ring-sky-500 border-slate-300">
+                                    <span class="ml-2">В наличии</span>
+                                </label>
+                                <label class="inline-flex items-center cursor-pointer text-sm font-medium text-slate-700">
+                                    <input type="radio" name="productStock" value="out" class="w-4 h-4 text-sky-600 focus:ring-sky-500 border-slate-300">
+                                    <span class="ml-2">Нет в наличии</span>
+                                </label>
+                            </div>
+                            <div>
+                                <input type="number" id="productStockQty" min="0" class="w-full h-[46px] px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="Количество на складе (шт.)">
+                            </div>
                         </div>
                     </div>
 
-                    <div id="singleJsonBlock" style="display:none;">
-                        <div class="form-group">
-                            <label>JSON товара</label>
-                            <textarea id="singleJsonInput" class="form-control" rows="6" placeholder='{"name":"...","category":"...","price":1000,"img":"..."}'></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Загрузка картинки</label>
-                            <input type="file" id="singleJsonImgFile" class="form-control" accept="image/*">
-                            <div class="muted">Если прикрепить файл — поле img будет заменено.</div>
-                        </div>
+                    <div>
+                        <label for="productRating" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Рейтинг (от 1.0 до 5.0)</label>
+                        <input type="number" id="productRating" min="1" max="5" step="0.1" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="4.8">
                     </div>
 
-                    <button type="submit" class="btn-primary" id="submitBtn">Добавить товар</button>
-                </form>
-            </div>
+                    <div>
+                        <label for="productReviews" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Количество отзывов</label>
+                        <input type="number" id="productReviews" min="0" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="8">
+                    </div>
 
-            <div class="tab-content" data-tab="bulk">
-                <div class="form-group">
-                    <label>JSON массив товаров</label>
-                    <textarea id="bulkJsonInput" class="form-control" rows="8" placeholder='[{"name":"...","category":"...","price":1000,"img":"file1.jpg","imageFile":"file1.jpg"}]'></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Файлы изображений</label>
-                    <input type="file" id="bulkImages" class="form-control" accept="image/*" multiple>
-                    <div class="muted">Укажи в JSON поле imageFile или img с именем файла для привязки.</div>
-                </div>
-                <button type="button" class="btn-primary" id="bulkImportBtn">Импортировать bulk</button>
-            </div>
+                    <div class="md:col-span-2">
+                        <label for="productDesc" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Описание товара</label>
+                        <textarea id="productDesc" rows="3" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-sm placeholder:text-slate-400" placeholder="Укажите подробное описание или важные характеристики товара..."></textarea>
+                    </div>
 
-            <div id="importStatus" class="status-line"></div>
-            <div id="importErrors" class="status-line error"></div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Медиа-файл (изображение товара)</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-start">
+                            <div class="sm:col-span-2 space-y-3">
+                                <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 hover:border-sky-500 rounded-xl p-4 cursor-pointer hover:bg-slate-50 transition-all group">
+                                    <i class="fa-solid fa-cloud-arrow-up text-xl text-slate-400 group-hover:text-sky-500 mb-2"></i>
+                                    <span class="text-xs font-semibold text-slate-600 group-hover:text-sky-600">Нажмите для загрузки картинки</span>
+                                    <span class="text-[10px] text-slate-400 mt-1">JPEG, PNG, WEBP, GIF</span>
+                                    <input type="file" id="productImageFile" class="hidden" accept="image/*">
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                        <i class="fa-solid fa-link text-xs"></i>
+                                    </div>
+                                    <input type="text" id="productImageUrl" class="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all text-xs placeholder:text-slate-400" placeholder="Или укажите прямую ссылку на картинку">
+                                </div>
+                            </div>
+                            <div class="relative border border-slate-100 rounded-xl bg-slate-50 aspect-square flex items-center justify-center overflow-hidden">
+                                <img id="productImagePreview" src="" alt="Превью" class="w-full h-full object-cover hidden">
+                                <div id="productImagePreviewPlaceholder" class="flex flex-col items-center text-slate-300">
+                                    <i class="fa-regular fa-image text-3xl mb-1"></i>
+                                    <span class="text-[10px] font-semibold tracking-wide uppercase">Нет фото</span>
+                                </div>
+                                <button type="button" id="removePreviewImgBtn" class="hidden absolute top-2 right-2 w-6 h-6 bg-rose-600 hover:bg-rose-700 text-white rounded-lg flex items-center justify-center transition-all shadow-md">
+                                    <i class="fa-solid fa-trash-can text-[10px]"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-6 border-t border-slate-100">
+                    <button type="button" id="cancelProductFormBtn" class="py-2.5 px-5 border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-semibold rounded-xl transition-all active:scale-[0.98]">
+                        Отмена
+                    </button>
+                    <button type="submit" class="py-2.5 px-6 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2 active:scale-[0.98]">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Сохранить товар</span>
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
+
+    <div id="bulkModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 w-full max-w-2xl transform transition-all my-8">
+            <div class="flex items-center justify-between p-6 border-b border-slate-100">
+                <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-file-import text-sky-500"></i>
+                    <span>Массовый импорт / экспорт каталога</span>
+                </h3>
+                <button type="button" id="closeBulkModalBtn" class="w-8 h-8 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <p class="text-xs text-slate-400 leading-relaxed">
+                    Вы можете выгрузить весь текущий каталог, скопировав текст ниже, или добавить товары, вставив массив JSON (поля name, category, price, img обязательны; id присваивает сервер).
+                </p>
+
+                <div>
+                    <label for="bulkJsonData" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Каталог в формате JSON</label>
+                    <textarea id="bulkJsonData" rows="12" class="w-full px-4 py-3 bg-slate-950 text-emerald-400 font-mono text-xs rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all" placeholder='[{ "name": "...", "category": "...", "price": 1000, "img": "..." }]'></textarea>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" id="copyJsonBtn" class="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-all flex items-center gap-2 active:scale-[0.98]">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Скопировать в буфер</span>
+                    </button>
+
+                    <div class="flex items-center gap-3">
+                        <button type="button" id="cancelBulkBtn" class="py-2.5 px-5 border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-semibold rounded-xl transition-all active:scale-[0.98]">
+                            Отмена
+                        </button>
+                        <button type="button" id="saveBulkBtn" class="py-2.5 px-6 bg-sky-600 hover:bg-sky-700 text-white text-sm font-semibold rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2 active:scale-[0.98]">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <span>Импортировать JSON</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-[60] flex flex-col gap-3 pointer-events-none"></div>
+
+    <script type="module" src="assets/js/admin.js"></script>
 </body>
 </html>

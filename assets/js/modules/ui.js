@@ -39,7 +39,7 @@ export const renderProducts = (products, container) => {
                         <span class="price">${formatPrice(product.price)}</span>
                         ${product.oldPrice && product.oldPrice > product.price ? `<span class="price-old">${formatPrice(product.oldPrice)}</span>` : ''}
                     </span>
-                    <button class="add-btn js-add-to-cart"
+                    <button type="button" class="add-btn js-add-to-cart"
                             data-id="${product.id}"
                             ${product.stock === 0 ? 'disabled aria-disabled="true"' : ''}
                             aria-label="Добавить ${product.name} в корзину">
@@ -93,6 +93,27 @@ export const renderProductsSkeleton = (container, count = 6) => {
     container.innerHTML = Array.from({ length: count }).map(() => `
         <article class="product-card skeleton-card"></article>
     `).join('');
+};
+
+export const bindAddToCart = (root, getProductById, onAdded) => {
+    if (!root) return;
+
+    root.addEventListener('click', (e) => {
+        const btn = e.target.closest('.js-add-to-cart');
+        if (!btn || btn.disabled) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const product = getProductById(btn.dataset.id);
+        if (product && product.stock === 0) {
+            onAdded('Нет в наличии');
+            return;
+        }
+
+        cartService.addItem(btn.dataset.id);
+        onAdded();
+    });
 };
 
 export const initNotifications = () => {
@@ -198,23 +219,34 @@ const categoryIcons = {
 export const renderFilters = (categories, container) => {
     const allCategories = ['Все', ...categories];
 
-    // В реальном проекте мы бы считали кол-во товаров, тут пока фейк или пусто
     container.innerHTML = allCategories.map(cat => `
         <li class="category-item ${cat === 'Все' ? 'active' : ''}" data-category="${cat}">
             <span>${cat}</span>
             <i class="fas fa-chevron-right" style="font-size: 0.7rem; opacity: 0.3;"></i>
         </li>
     `).join('');
+
+    const chips = document.getElementById('categoryChips');
+    if (chips) {
+        chips.innerHTML = allCategories.map(cat => `
+            <button type="button" class="category-chip ${cat === 'Все' ? 'active' : ''}" data-category="${cat}" role="tab" aria-selected="${cat === 'Все'}">${cat}</button>
+        `).join('');
+    }
 };
 
-// Переключение активного класса
 export const setActiveFilter = (category) => {
-    const items = document.querySelectorAll('.category-item');
-    items.forEach(item => {
-        if (item.dataset.category === category) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
+    document.querySelectorAll('.category-item, .category-chip').forEach(item => {
+        const isActive = item.dataset.category === category;
+        item.classList.toggle('active', isActive);
+        if (item.classList.contains('category-chip')) {
+            item.setAttribute('aria-selected', isActive ? 'true' : 'false');
         }
     });
+
+    const chipsTrack = document.getElementById('categoryChips');
+    const activeChip = chipsTrack?.querySelector(`.category-chip[data-category="${CSS.escape(category)}"]`);
+    if (activeChip && chipsTrack) {
+        const targetLeft = activeChip.offsetLeft - (chipsTrack.clientWidth - activeChip.offsetWidth) / 2;
+        chipsTrack.scrollLeft = Math.max(0, targetLeft);
+    }
 };

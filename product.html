@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/variables.css">
     <link rel="stylesheet" href="assets/css/app.css">
@@ -16,12 +16,13 @@
     <script type="module" src="assets/js/product.js" defer></script>
 </head>
 <body>
+
     <header class="site-header">
         <div class="header-container container">
             <a href="index.html" class="logo">Ванная комната <sup>1</sup></a>
             <div class="header-actions">
-                <a href="index.html#catalog" class="btn-outline" style="padding:10px 16px; text-decoration:none;">В каталог</a>
-                <button class="icon-btn cart-trigger-btn" id="openCartBtn" aria-label="Корзина">
+                <a href="index.html#catalog" class="btn-catalog-link">В каталог</a>
+                <button type="button" class="icon-btn cart-trigger-btn" id="openCartBtn" aria-label="Корзина">
                     <span class="btn-label">Корзина</span>
                     <span class="cart-badge" id="cartCount">0</span>
                 </button>
@@ -32,17 +33,17 @@
     <main class="product-page container">
         <nav class="breadcrumb" aria-label="breadcrumb">
             <a href="index.html">Главная</a>
-            <span>›</span>
+            <span aria-hidden="true">›</span>
             <a href="index.html#catalog">Каталог</a>
-            <span>›</span>
+            <span aria-hidden="true">›</span>
             <span id="productCrumb">Товар</span>
         </nav>
 
         <section class="product-layout" id="productSection">
             <div class="product-gallery">
                 <div class="product-img-wrapper product-main-img">
-                    <span id="productBadge" class="product-badge" style="display:none;"></span>
-                    <img id="productImage" src="" alt="">
+                    <span id="productBadge" class="product-badge" hidden></span>
+                    <img id="productImage" src="" alt="Изображение товара" loading="lazy">
                 </div>
             </div>
 
@@ -51,86 +52,127 @@
                     <div id="productCategory" class="product-modal-category"></div>
                     <h1 id="productTitle" class="product-modal-title"></h1>
                     <div id="productSku" class="product-sku"></div>
-                    <div id="productRating" class="product-rating"></div>
+                    <div class="product-rating-wrap">
+                        <div id="productRating" class="product-rating"></div>
+                    </div>
                     <div id="productStock" class="product-stock"></div>
                 </div>
 
                 <div class="product-pricing">
                     <span id="productPrice" class="price"></span>
-                    <span id="productOldPrice" class="price-old" style="display:none;"></span>
+                    <span id="productOldPrice" class="price-old" hidden></span>
                 </div>
 
-                <div class="product-actions">
-                    <div class="qty-control">
-                        <button class="qty-btn" id="qtyMinus" aria-label="Уменьшить">−</button>
-                        <input type="number" id="qtyInput" min="1" value="1">
-                        <button class="qty-btn" id="qtyPlus" aria-label="Увеличить">+</button>
+                <div class="product-actions-panel">
+                    <div class="product-actions-row">
+                        <div class="qty-control">
+                            <button type="button" class="qty-btn" id="qtyMinus" aria-label="Уменьшить">−</button>
+                            <input type="number" id="qtyInput" min="1" value="1" readonly>
+                            <button type="button" class="qty-btn" id="qtyPlus" aria-label="Увеличить">+</button>
+                        </div>
+                        <button type="button" class="btn-primary" id="addToCartBtn">В корзину</button>
                     </div>
-                    <button class="btn btn-block" id="addToCartBtn">В корзину</button>
-                    <button class="btn-outline btn-full" id="buyOneClickBtn">Купить в 1 клик</button>
+                    <button type="button" class="btn-outline btn-full" id="buyOneClickBtn">Купить в 1 клик</button>
+                </div>
+
+                <div class="product-detail-stack">
+                    <div class="product-detail-block">
+                        <h2 class="product-detail-heading">О товаре</h2>
+                        <p id="productDesc" class="product-detail-text"></p>
+                    </div>
+
+                    <div class="product-detail-block">
+                        <h2 class="product-detail-heading">Характеристики</h2>
+                        <ul id="productSpecs" class="specs-list specs-list-compact"></ul>
+                    </div>
+
+                    <div class="product-detail-block product-delivery-block">
+                        <h2 class="product-detail-heading">Доставка и оплата</h2>
+                        <ul class="delivery-highlights">
+                            <li>
+                                <span class="delivery-highlight-icon" aria-hidden="true"><i class="fas fa-truck"></i></span>
+                                <span><strong>Новосибирск</strong> — курьер в день заказа или на следующий. Бесплатно от 5 000 ₽.</span>
+                            </li>
+                            <li>
+                                <span class="delivery-highlight-icon" aria-hidden="true"><i class="fas fa-store"></i></span>
+                                <span><strong>Самовывоз</strong> — бесплатно из шоурума в Новосибирске.</span>
+                            </li>
+                            <li>
+                                <span class="delivery-highlight-icon" aria-hidden="true"><i class="fas fa-box"></i></span>
+                                <span><strong>По России</strong> — СДЭК, Почта России, Деловые Линии, 2–7 рабочих дней.</span>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="product-tabs">
-            <div class="tab-buttons">
-                <button class="tab-btn active" data-tab="desc">Описание</button>
-                <button class="tab-btn" data-tab="specs">Характеристики</button>
-                <button class="tab-btn" data-tab="delivery">Доставка</button>
-                <button class="tab-btn" data-tab="reviews">Отзывы</button>
-            </div>
-            <div class="tab-content active" data-tab="desc">
-                <p id="productDesc"></p>
-            </div>
-            <div class="tab-content" data-tab="specs">
-                <ul id="productSpecs" class="specs-list"></ul>
-            </div>
-            <div class="tab-content" data-tab="delivery">
-                <p>Доставка по Новосибирску и регионам. Точные сроки и стоимость зависят от адреса.</p>
-            </div>
-            <div class="tab-content" data-tab="reviews">
-                <p>Отзывы появятся после запуска личного кабинета.</p>
-            </div>
-        </section>
+        <div id="productDetails">
+            <section class="product-reviews-section" id="productReviews" aria-labelledby="productReviewsTitle">
+                <div class="product-reviews-intro">
+                    <div>
+                        <p class="product-reviews-eyebrow">Мнения покупателей</p>
+                        <h2 class="product-reviews-title" id="productReviewsTitle">Отзывы</h2>
+                        <p class="product-reviews-lead">Публикуем только проверенные отзывы после модерации.</p>
+                    </div>
+                </div>
 
-        <section class="products-empty" id="productNotFound" style="display:none;">
+                <div class="reviews-dashboard reviews-dashboard-hero">
+                    <div class="reviews-summary">
+                        <div class="summary-score" id="summaryScore">—</div>
+                        <div>
+                            <div class="summary-stars" id="summaryStars" aria-hidden="true"></div>
+                            <div class="summary-count" id="summaryCount">Загрузка...</div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-primary" id="writeReviewBtn">Оставить отзыв</button>
+                </div>
+
+                <div class="reviews-list" id="productReviewsList"></div>
+            </section>
+
+            <section class="related-products">
+                <h2 class="section-title-small">Вам также может понравиться</h2>
+                <div class="products-grid products-grid-related" id="relatedProductsGrid"></div>
+            </section>
+        </div>
+
+        <section class="products-empty" id="productNotFound" hidden>
+            <div class="products-empty-icon" aria-hidden="true">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
             <strong>Товар не найден</strong>
-            <div>Вернитесь в каталог и попробуйте другой товар.</div>
+            <p>Вернитесь в каталог и попробуйте выбрать другое изделие.</p>
+            <a href="index.html#catalog" class="btn-primary products-empty-link">Перейти в каталог</a>
         </section>
     </main>
 
     <footer class="site-footer">
         <div class="container">
             <div class="footer-content">
-                <div class="footer-section">
-                    <div class="logo" style="margin-bottom: 15px;">Ванная<span>комната</span></div>
-                    <p style="color: #999; margin-bottom: 10px;">Премиальные аксессуары для создания идеальной ванной комнаты</p>
-                    <p style="color: #999; font-size: 0.9em;">Качество и комфорт в каждой детали</p>
+                <div class="footer-section brand-section">
+                    <div class="logo">Ванная комната <sup>1</sup></div>
+                    <p class="footer-desc">Премиальные аксессуары для создания гармонии и эстетики в вашей ванной комнате.</p>
                 </div>
-
                 <div class="footer-section">
-                    <h4 style="color: #fff; margin-bottom: 15px; font-weight: 600;">Информация</h4>
+                    <h4>Навигация</h4>
                     <ul class="footer-links">
-                        <li><a href="index.html#catalog" style="color: #ccc; text-decoration: none;">Каталог</a></li>
-                        <li><a href="index.html" style="color: #ccc; text-decoration: none;">Главная</a></li>
+                        <li><a href="index.html#catalog">Каталог</a></li>
+                        <li><a href="index.html">Главная</a></li>
                     </ul>
                 </div>
-
                 <div class="footer-section">
-                    <h4 style="color: #fff; margin-bottom: 15px; font-weight: 600;">Контакты</h4>
-                    <div style="color: #ccc; font-size: 0.9em;">
-                        <p style="margin-bottom: 5px;"><i class="fas fa-phone" style="margin-right: 8px;"></i>+7 (383) 299-06-67</p>
-                        <p style="margin-bottom: 5px;"><i class="fas fa-envelope" style="margin-right: 8px;"></i>van-komnata@mail.ru</p>
-                        <p><i class="fas fa-map-marker-alt" style="margin-right: 8px;"></i>Новосибирск, Россия</p>
+                    <h4>Контакты</h4>
+                    <div class="footer-contacts">
+                        <p><i class="fas fa-phone"></i> +7 (383) 299-06-67</p>
+                        <p><i class="fas fa-envelope"></i> van-komnata@mail.ru</p>
+                        <p><i class="fas fa-map-marker-alt"></i> Новосибирск, Россия</p>
                     </div>
                 </div>
             </div>
-
             <div class="footer-bottom">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 1px solid #333;">
-                    <p style="color: #777; font-size: 0.85em;">&copy; 2026 Ванная комната. Все права защищены.</p>
-                    <p style="color: #777; font-size: 0.85em;">Сайт разработан с ❤️</p>
-                </div>
+                <p>&copy; 2026 Ванная комната. Все права защищены.</p>
+                <p>Сайт разработан с ❤️</p>
             </div>
         </div>
     </footer>
@@ -141,7 +183,7 @@
     <aside class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
             <h3>Корзина</h3>
-            <button class="close-cart" id="closeCart">&times;</button>
+            <button type="button" class="close-cart" id="closeCart" aria-label="Закрыть">&times;</button>
         </div>
         <div class="cart-body" id="cartItemsContainer"></div>
         <div class="cart-footer">
@@ -149,8 +191,56 @@
                 <span>Итого:</span>
                 <span id="cartTotalSum">0 ₽</span>
             </div>
-            <button class="btn btn-block" id="checkoutBtn">Оформить заказ</button>
+            <button type="button" class="btn btn-block" id="checkoutBtn">Оформить заказ</button>
         </div>
     </aside>
+
+    <div class="modal-overlay" id="oneClickModal">
+        <div class="modal-window city-modal-window">
+            <button type="button" class="modal-close" data-close-modal="oneClickModal" aria-label="Закрыть">&times;</button>
+            <h3 class="modal-title">Быстрый заказ</h3>
+            <p class="modal-subtitle">Оставьте контакты — менеджер свяжется с вами в течение 15 минут.</p>
+            <form id="oneClickForm">
+                <input type="hidden" id="oneClickProductId">
+                <div class="input-group">
+                    <input type="text" id="oneClickName" class="input-field" placeholder="Ваше имя" required autocomplete="name">
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="oneClickPhone" class="input-field" placeholder="Телефон" required autocomplete="tel">
+                </div>
+                <button type="submit" class="btn btn-block">Заказать в 1 клик</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal-window city-modal-window">
+            <button type="button" class="modal-close" data-close-modal="reviewModal" aria-label="Закрыть">&times;</button>
+            <h3 class="modal-title">Ваш отзыв</h3>
+            <p class="modal-subtitle">Поделитесь впечатлениями о качестве и использовании товара.</p>
+            <form id="leaveReviewForm">
+                <div class="input-group">
+                    <input type="text" id="reviewAuthor" class="input-field" placeholder="Ваше имя" required>
+                </div>
+                <div class="input-group rating-selection-group">
+                    <span class="rating-label">Ваша оценка *</span>
+                    <div class="rating-selector" id="ratingSelector" role="group" aria-label="Оценка">
+                        <i class="fa-regular fa-star" data-rating="1" role="button" tabindex="0" aria-label="1 звезда"></i>
+                        <i class="fa-regular fa-star" data-rating="2" role="button" tabindex="0" aria-label="2 звезды"></i>
+                        <i class="fa-regular fa-star" data-rating="3" role="button" tabindex="0" aria-label="3 звезды"></i>
+                        <i class="fa-regular fa-star" data-rating="4" role="button" tabindex="0" aria-label="4 звезды"></i>
+                        <i class="fa-regular fa-star" data-rating="5" role="button" tabindex="0" aria-label="5 звёзд"></i>
+                    </div>
+                    <input type="hidden" id="selectedRating" value="5">
+                </div>
+                <div class="input-group">
+                    <textarea id="reviewText" class="input-field input-field-textarea" placeholder="Текст отзыва..." rows="4" required></textarea>
+                </div>
+                <p id="reviewFormError" class="review-form-error" hidden role="alert"></p>
+                <button type="submit" class="btn btn-block">Отправить отзыв</button>
+            </form>
+        </div>
+    </div>
+
 </body>
 </html>

@@ -23,7 +23,7 @@
 </head>
 <body class="h-full font-sans antialiased text-slate-800 flex flex-col">
 
-    <div id="adminAuthOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm transition-all duration-300" style="display: flex;">
+    <div id="adminAuthOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm transition-all duration-300">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-100 p-8 w-full max-w-md mx-4">
             <div class="text-center mb-6">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-sky-50 rounded-full text-sky-500 mb-4">
@@ -97,7 +97,7 @@
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center gap-5">
                 <div class="w-12 h-12 bg-sky-50 text-sky-500 rounded-xl flex items-center justify-center text-xl">
                     <i class="fa-solid fa-boxes-stacked"></i>
@@ -125,6 +125,16 @@
                 <div>
                     <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Нет в наличии</span>
                     <span class="text-2xl font-bold text-slate-900" id="statOutOfStock">0</span>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm flex items-center gap-5">
+                <div class="w-12 h-12 bg-amber-50 text-amber-500 rounded-xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Отзывы на модерации</span>
+                    <span class="text-2xl font-bold text-slate-900" id="statPendingReviews">0</span>
                 </div>
             </div>
         </section>
@@ -162,7 +172,7 @@
             </div>
         </section>
 
-        <section class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <section id="productsTableSection" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
@@ -185,6 +195,37 @@
                 </div>
                 <h4 class="text-slate-900 font-bold text-lg">Товары не найдены</h4>
                 <p class="text-slate-400 text-sm max-w-xs mx-auto mt-1">Попробуйте сбросить параметры поиска или добавить новую позицию в каталог.</p>
+            </div>
+        </section>
+
+        <section id="reviewsModerationSection" class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden" hidden>
+            <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Модерация отзывов</h2>
+                    <p class="text-sm text-slate-400 mt-0.5">Новые отзывы не публикуются, пока вы не нажмёте «Одобрить»</p>
+                </div>
+                <button type="button" id="refreshReviewsBtn" class="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-semibold rounded-lg transition-all flex items-center gap-2 self-start">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>Обновить</span>
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="py-3 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Товар</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Автор</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Оценка</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Текст</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase tracking-wider text-slate-500">Статус</th>
+                            <th class="py-3 px-6 text-xs font-bold uppercase tracking-wider text-slate-500 text-right">Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewsTableBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+            <div id="noReviewsState" class="hidden py-12 text-center text-slate-400 text-sm">
+                Отзывов пока нет.
             </div>
         </section>
     </main>
@@ -278,7 +319,7 @@
                                 <label class="flex flex-col items-center justify-center border-2 border-dashed border-slate-200 hover:border-sky-500 rounded-xl p-4 cursor-pointer hover:bg-slate-50 transition-all group">
                                     <i class="fa-solid fa-cloud-arrow-up text-xl text-slate-400 group-hover:text-sky-500 mb-2"></i>
                                     <span class="text-xs font-semibold text-slate-600 group-hover:text-sky-600">Нажмите для загрузки картинки</span>
-                                    <span class="text-[10px] text-slate-400 mt-1">JPEG, PNG, WEBP, GIF</span>
+                                    <span class="text-[10px] text-slate-400 mt-1">JPEG, PNG, WEBP, GIF · до 10 МБ</span>
                                     <input type="file" id="productImageFile" class="hidden" accept="image/*">
                                 </label>
                                 <div class="relative">

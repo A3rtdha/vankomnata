@@ -1,4 +1,4 @@
-import { renderProducts, renderProductsSkeleton, initNotifications, updateCartCounter, toggleCart, renderCart, renderFilters, setActiveFilter } from './modules/ui.js';
+import { renderProducts, renderProductsSkeleton, initNotifications, updateCartCounter, toggleCart, renderCart, renderFilters, setActiveFilter, bindAddToCart } from './modules/ui.js';
 import { cartService } from './modules/cart.js';
 import { productService } from './modules/productService.js';
 import { geoService } from './modules/geoService.js';
@@ -47,15 +47,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderProducts(filtered, grid);
     };
 
-    // 1. Клик по категории
-    sidebarList.addEventListener('click', (e) => {
-        const item = e.target.closest('.category-item');
-        if (!item) return;
+    const filtersOverlay = document.getElementById('filtersOverlay');
+    const catalogSidebar = document.getElementById('catalogSidebar');
+    const openFiltersBtn = document.getElementById('openFiltersBtn');
+    const closeFiltersBtn = document.getElementById('closeFiltersBtn');
+    const filtersMq = window.matchMedia('(max-width: 992px)');
 
-        currentCategory = item.dataset.category;
+    const toggleFilters = (open) => {
+        if (!filtersMq.matches) return;
+        catalogSidebar?.classList.toggle('open', open);
+        filtersOverlay?.classList.toggle('open', open);
+        document.body.classList.toggle('filters-open', open);
+        openFiltersBtn?.setAttribute('aria-expanded', open ? 'true' : 'false');
+        filtersOverlay?.setAttribute('aria-hidden', open ? 'false' : 'true');
+    };
+
+    openFiltersBtn?.addEventListener('click', () => toggleFilters(true));
+    closeFiltersBtn?.addEventListener('click', () => toggleFilters(false));
+    filtersOverlay?.addEventListener('click', () => toggleFilters(false));
+
+    const selectCategory = (category) => {
+        currentCategory = category;
         setActiveFilter(currentCategory);
         trackCategoryInterest(currentCategory);
         applyFilters();
+        toggleFilters(false);
+    };
+
+    // 1. Клик по категории (сайдбар и чипы)
+    document.querySelector('.catalog-wrapper')?.addEventListener('click', (e) => {
+        const item = e.target.closest('.category-item, .category-chip');
+        if (!item) return;
+        selectCategory(item.dataset.category);
     });
 
     // 2. Поиск (переместили input в сайдбар)
@@ -73,20 +96,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         maxPrice = maxVal ? Number(maxVal) : 999999;
 
         applyFilters();
+        toggleFilters(false);
     });
 
     // --- 3. Обработчики событий (остальное без изменений) ---
-    grid.addEventListener('click', (e) => {
-        const btn = e.target.closest('.js-add-to-cart');
-        if (!btn) return;
-        const product = productService.getById(btn.dataset.id);
-        if (product && product.stock === 0) {
-            showToast('Нет в наличии');
-            return;
-        }
-        cartService.addItem(btn.dataset.id);
-        showToast();
-    });
+    bindAddToCart(
+        document.getElementById('homePage'),
+        (id) => productService.getById(id),
+        (message) => showToast(message)
+    );
 
     document.getElementById('openCartBtn').addEventListener('click', () => toggleCart(true));
     document.getElementById('closeCart').addEventListener('click', () => toggleCart(false));
@@ -103,6 +121,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.scrollToCatalog = () => {
         document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
     };
+
+    const siteHeader = document.querySelector('.site-header');
+    if (document.body.classList.contains('page-home') && siteHeader) {
+        let headerTicking = false;
+        let headerScrolled = false;
+
+        const syncHeaderOnScroll = () => {
+            if (headerTicking) return;
+            headerTicking = true;
+
+            requestAnimationFrame(() => {
+                const y = window.scrollY;
+                const next = headerScrolled ? y > 24 : y > 72;
+                if (next !== headerScrolled) {
+                    headerScrolled = next;
+                    siteHeader.classList.toggle('is-scrolled', next);
+                }
+                headerTicking = false;
+            });
+        };
+
+        syncHeaderOnScroll();
+        window.addEventListener('scroll', syncHeaderOnScroll, { passive: true });
+    }
 
     window.toggleModal = (id, show) => {
         const modal = document.getElementById(id);
@@ -132,19 +174,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 1. Скрываем товары и футер корзины
         cartBody.innerHTML = `
             <div class="checkout-form">
-                <h3 style="margin-bottom:20px;">Оформление</h3>
+                <h3>Оформление</h3>
                 <form id="orderForm">
                     <div class="form-group">
-                        <input type="text" name="fullName" autocomplete="name" class="form-control" placeholder="Ваше имя" required style="margin-bottom:10px;">
+                        <input type="text" name="fullName" autocomplete="name" class="form-control" placeholder="Ваше имя" required>
                     </div>
                     <div class="form-group">
-                        <input type="tel" name="phone" inputmode="tel" autocomplete="tel" class="form-control" placeholder="Телефон" required style="margin-bottom:10px;">
+                        <input type="tel" name="phone" inputmode="tel" autocomplete="tel" class="form-control" placeholder="Телефон" required>
                     </div>
                     <div class="form-group">
-                        <input type="text" name="address" autocomplete="street-address" class="form-control" placeholder="Адрес доставки" required style="margin-bottom:20px;">
+                        <input type="text" name="address" autocomplete="street-address" class="form-control" placeholder="Адрес доставки" required>
                     </div>
-                    <button type="submit" class="btn btn-block">Подтвердить заказ</button>
-                    <button type="button" id="backToCart" class="btn btn-block" style="background:#eee; color:#333; margin-top:10px;">Назад</button>
+                    <button type="submit" class="btn btn-block btn-submit">Подтвердить заказ</button>
+                    <button type="button" id="backToCart" class="btn btn-block btn-back">Назад в корзину</button>
                 </form>
             </div>
         `;

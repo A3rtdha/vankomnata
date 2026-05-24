@@ -43,9 +43,6 @@
 
             <!-- ACTIONS -->
             <div class="header-actions">
-                <button class="icon-btn" id="authBtn" aria-label="Профиль">
-                    <i class="fas fa-user"></i>
-                </button>
                 <button class="icon-btn cart-trigger-btn" id="openCartBtn" aria-label="Корзина">
                     <span class="btn-label">Корзина</span>
                     <span class="cart-badge" id="cartCount">0</span>
@@ -213,44 +210,6 @@
             <button class="btn btn-block" id="checkoutBtn">Оформить заказ</button>
         </div>
     </aside>
-
-    <!-- MODAL: LOGIN -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal-window">
-            <button class="modal-close" onclick="toggleModal('loginModal', false)">&times;</button>
-            <h2 class="modal-title">Вход в систему</h2>
-            <form id="loginForm">
-                <div class="input-group">
-                    <input type="text" id="username" class="input-field" placeholder="Логин (admin или user)" required>
-                </div>
-                <div class="input-group">
-                    <input type="password" id="password" class="input-field" placeholder="Пароль" required>
-                </div>
-                <div id="loginError" class="form-error" role="alert"></div>
-                <button type="submit" class="btn btn-block">Войти</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: USER CABINET -->
-    <div class="modal-overlay" id="userModal">
-        <div class="modal-window">
-            <button class="modal-close" onclick="toggleModal('userModal', false)">&times;</button>
-            <h2 class="modal-title">Привет, <span id="userNameDisplay">User</span>! 👋</h2>
-
-            <div class="user-stat-card">
-                <div class="user-stat-val" id="userInterest">...</div>
-                <div class="user-stat-label">Ваша любимая категория</div>
-            </div>
-
-            <p style="text-align: center; margin: 20px 0; color: #666;">
-                На основе ваших предпочтений мы подобрали для вас лучшие товары.
-            </p>
-
-            <button onclick="authService.logout()" class="btn btn-block" style="background: #e74c3c;">Выйти</button>
-        </div>
-    </div>
-
 
     <!-- MODAL: CITY SELECTION -->
     <div class="modal-overlay" id="cityModal">

@@ -1,5 +1,8 @@
 FROM php:8.2-cli
 
+# Устанавливаем необходимые зависимости и PDO-драйверы для MySQL
+RUN docker-php-ext-install pdo pdo_mysql
+
 WORKDIR /app
 
 COPY . /app

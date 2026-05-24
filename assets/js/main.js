@@ -1,7 +1,6 @@
 import { renderProducts, renderProductsSkeleton, initNotifications, updateCartCounter, toggleCart, renderCart, renderFilters, setActiveFilter } from './modules/ui.js';
 import { cartService } from './modules/cart.js';
 import { productService } from './modules/productService.js';
-import { authService } from './modules/authService.js';
 import { geoService } from './modules/geoService.js';
 import { pagesContent } from './data/pages.js';
 
@@ -27,6 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     let maxPrice = 999999;
     let searchQuery = '';
 
+    const trackCategoryInterest = (category) => {
+        if (category === 'Все') return;
+        const key = 'vannaya_pref';
+        const prefs = JSON.parse(localStorage.getItem(key) || '{}');
+        prefs[category] = (prefs[category] || 0) + 1;
+        localStorage.setItem(key, JSON.stringify(prefs));
+    };
+
     // Функция применения всех фильтров разом
     const applyFilters = () => {
         const filtered = products.filter(p => {
@@ -47,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         currentCategory = item.dataset.category;
         setActiveFilter(currentCategory);
-        authService.trackInterest(currentCategory);
+        trackCategoryInterest(currentCategory);
         applyFilters();
     });
 
@@ -97,62 +104,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('catalog').scrollIntoView({ behavior: 'smooth' });
     };
 
-    // --- 4. AUTH & USER LOGIC ---
-
-    // Глобальная функция для модалок (чтобы работала из HTML onclick)
     window.toggleModal = (id, show) => {
         const modal = document.getElementById(id);
         if (show) modal.classList.add('open');
         else modal.classList.remove('open');
     };
 
-    // Делаем сервисы глобальными для onclick хендлеров в HTML
-    window.authService = authService;
     window.geoService = geoService;
-
-    const loginError = document.getElementById('loginError');
-
-    // Кнопка в хедере (Логин или Профиль)
-    const currentUser = authService.getCurrentUser();
-    const authBtn = document.getElementById('authBtn');
-
-    if (currentUser) {
-        // Если вошел - иконка юзера зеленая
-        authBtn.innerHTML = '<i class="fas fa-user-check" style="color: var(--color-accent)"></i>';
-        authBtn.onclick = () => {
-            // Заполняем данные кабинета перед открытием
-            document.getElementById('userNameDisplay').textContent = currentUser.name;
-            document.getElementById('userInterest').textContent = authService.getTopInterest();
-            toggleModal('userModal', true);
-        };
-    } else {
-        // Если гость - открываем форму входа
-        authBtn.onclick = () => {
-            if (loginError) {
-                loginError.textContent = '';
-                loginError.style.display = 'none';
-            }
-            toggleModal('loginModal', true);
-        };
-    }
-
-    // Обработка формы входа
-    document.getElementById('loginForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const l = document.getElementById('username').value.trim();
-        const p = document.getElementById('password').value.trim();
-
-        if (loginError) {
-            loginError.textContent = '';
-            loginError.style.display = 'none';
-        }
-
-        const res = authService.login(l, p);
-        if (!res.success && loginError) {
-            loginError.textContent = res.msg;
-            loginError.style.display = 'block';
-        }
-    });
 
     // --- CHECKOUT LOGIC ---
     // Находим кнопку оформления в сайдбаре (она динамическая или статическая?
